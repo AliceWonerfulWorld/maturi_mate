@@ -9,7 +9,7 @@ import { dummyTasks, dummyFeedbacks } from '@/lib/dummy-data';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
-export default function TaskDetailPage() {
+export default function ParticipantTaskDetailPage() {
   const params = useParams();
   const taskId = params.id as string;
   const task = dummyTasks.find(t => t.id === taskId);
@@ -21,7 +21,7 @@ export default function TaskDetailPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">タスクが見つかりません</h1>
-          <Link href="/">
+          <Link href="/participant">
             <Button>ホームに戻る</Button>
           </Link>
         </div>
@@ -39,7 +39,7 @@ export default function TaskDetailPage() {
       {/* ヘッダー */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-md mx-auto px-4 py-4 flex items-center">
-          <Link href="/" className="mr-4">
+          <Link href="/participant" className="mr-4">
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <h1 className="text-lg font-semibold">タスク詳細</h1>

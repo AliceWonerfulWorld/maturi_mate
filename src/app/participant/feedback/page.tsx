@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Star } from 'lucide-react';
 import Link from 'next/link';
 
-export default function FeedbackPage() {
+export default function ParticipantFeedbackPage() {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -35,7 +35,7 @@ export default function FeedbackPage() {
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-4">口コミを投稿しました！</h1>
           <p className="text-gray-600 mb-6">ご協力ありがとうございます。</p>
-          <Link href="/">
+          <Link href="/participant">
             <Button>ホームに戻る</Button>
           </Link>
         </div>
@@ -48,7 +48,7 @@ export default function FeedbackPage() {
       {/* ヘッダー */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-md mx-auto px-4 py-4 flex items-center">
-          <Link href="/" className="mr-4">
+          <Link href="/participant" className="mr-4">
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <h1 className="text-lg font-semibold">口コミ投稿</h1>

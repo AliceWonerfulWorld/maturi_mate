@@ -41,3 +41,20 @@ export interface Feedback {
   createdAt: string;
   userName: string;
 }
+
+export interface OrganizerTask extends Task {
+  applicants: Application[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Applicant {
+  id: string;
+  name: string;
+  age: number;
+  profile: string;
+  level: number;
+  badges: string[];
+  appliedAt: string;
+  status: 'pending' | 'approved' | 'rejected';
+}
