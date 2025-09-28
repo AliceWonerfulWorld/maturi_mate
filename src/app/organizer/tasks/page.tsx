@@ -111,6 +111,7 @@ export default function OrganizerTasksPage() {
 function TaskCard({ task }: { 
   task: OrganizerTask & { applicationRate: number; isPopular: boolean }; 
 }) {
+  const applications = dummyApplications.filter(app => app.taskId === task.id);
   return (
     <Card className="group hover:shadow-lg transition-all duration-300 bg-white/90 backdrop-blur-sm border-0 shadow-xl">
       <CardHeader className="pb-3">
@@ -169,7 +170,7 @@ function TaskCard({ task }: {
         </div>
         <div className="flex justify-between items-center mt-3">
           <div className="text-sm text-gray-600">
-            応募者: {task.applicants.length}人 ({task.applicationRate}%)
+            応募者: {applications.length}人 ({task.applicationRate}%)
           </div>
           <Link href="/organizer/applications" >
             <Button size="sm" className="bg-gradient-to-r from-slate-600 to-gray-700 hover:from-slate-700 hover:to-gray-800 text-white">

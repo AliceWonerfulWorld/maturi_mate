@@ -40,7 +40,6 @@ export default function ParticipantEvaluationPage() {
   // 参加者の関連タスクを取得
   const relatedTasks = useMemo(() => {
     return dummyOrganizerTasks.filter(task => {
-      // 簡単な関連付け（実際のアプリではより複雑なロジック）
       return task.createdBy === 'org1'; // 現在の運営者のタスク
     });
   }, []);

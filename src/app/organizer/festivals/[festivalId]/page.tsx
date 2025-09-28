@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { MapPin, Calendar, Clock, Users, Plus, ArrowLeft, Eye, UserCheck, TrendingUp } from 'lucide-react';
 import { dummyFestivals, dummyOrganizerTasks } from '@/lib/dummy-data';
 import { Festival, OrganizerTask } from '@/types';
+import { getRelatedTasks } from '@/lib/relations';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
@@ -19,13 +20,10 @@ export default function OrganizerFestivalDetailPage() {
     return dummyFestivals.find(f => f.id === festivalId);
   }, [festivalId]);
 
-  // 祭りに関連するタスクを取得
+  // 祭りに関連するタスクを取得（統一されたロジック）
   const relatedTasks = useMemo(() => {
-    return dummyOrganizerTasks.filter(task => {
-      // 簡単な関連付け（実際のアプリではより複雑なロジック）
-      return task.location === festival?.location || 
-             task.title.toLowerCase().includes(festival?.name.toLowerCase().split(' ')[0] || '');
-    });
+    if (!festival) return [];
+    return getRelatedTasks(festival, dummyOrganizerTasks, false);
   }, [festival]);
 
   if (!festival) {
