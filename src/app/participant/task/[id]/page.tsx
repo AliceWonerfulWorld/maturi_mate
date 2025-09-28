@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Calendar, Clock, Users, Gift, ArrowLeft } from 'lucide-react';
-import { dummyTasks } from '@/lib/dummy-data';
+import { MapPin, Calendar, Clock, Users, Gift, ArrowLeft, ClipboardList } from 'lucide-react';
+import { dummyTasks, dummyFestivals } from '@/lib/dummy-data';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
@@ -14,6 +14,12 @@ export default function ParticipantTaskDetailPage() {
   const taskId = params.id as string;
   const task = dummyTasks.find(t => t.id === taskId);
   const [isApplied, setIsApplied] = useState(false);
+
+  // タスクに関連する祭りを特定（場所と日付で関連付け）
+  const relatedFestival = task ? dummyFestivals.find(festival => 
+    festival.location === task.location && 
+    festival.date === task.date
+  ) : null;
 
   if (!task) {
     return (
@@ -57,6 +63,9 @@ export default function ParticipantTaskDetailPage() {
             <div className="flex-1"></div>
           </div>
           <div className="text-center">
+            <div className="inline-flex items-center justify-center w-8 h-8 bg-gradient-to-r from-slate-600 to-gray-700 rounded-full mb-1 shadow-lg">
+              <ClipboardList className="h-4 w-4 text-white" />
+            </div>
             <h1 className="text-lg font-bold bg-gradient-to-r from-slate-700 to-gray-800 bg-clip-text text-transparent">
               タスク詳細
             </h1>
@@ -143,19 +152,21 @@ export default function ParticipantTaskDetailPage() {
         )}
 
         {/* 関連祭りへのリンク */}
-        <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
-          <CardContent className="p-6 text-center">
-            <h3 className="text-lg font-semibold text-slate-800 mb-2">このタスクに関連する祭り</h3>
-            <p className="text-sm text-gray-600 mb-4">
-              祭りの詳細情報や他のタスク、参加者の口コミを確認できます
-            </p>
-            <Link href="/participant/festivals">
-              <Button variant="outline" className="w-full bg-white/80 border-slate-300 text-slate-700 hover:bg-slate-50">
-                祭り一覧を見る
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
+        {relatedFestival && (
+          <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
+            <CardContent className="p-6 text-center">
+              <h3 className="text-lg font-semibold text-slate-800 mb-2">このタスクに関連する祭り</h3>
+              <p className="text-sm text-gray-600 mb-4">
+                祭りの詳細情報や他のタスク、参加者の口コミを確認できます
+              </p>
+              <Link href={`/participant/festivals/${relatedFestival.id}`}>
+                <Button variant="outline" className="w-full bg-white/80 border-slate-300 text-slate-700 hover:bg-slate-50">
+                  {relatedFestival.name}の詳細を見る
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* ナビゲーション */}

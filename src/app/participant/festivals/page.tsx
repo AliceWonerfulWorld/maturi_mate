@@ -4,10 +4,11 @@ import { useState, useMemo, memo, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Search, MapPin, Calendar, Clock, Star, ArrowLeft, Home, Users } from 'lucide-react';
+import { Search, MapPin, Calendar, Clock, Star, ArrowLeft, Users } from 'lucide-react';
 import { dummyFestivals, dummyFestivalReviews } from '@/lib/dummy-data';
 import { Festival } from '@/types';
 import Link from 'next/link';
+import HomeButton from '@/components/HomeButton';
 
 export default function ParticipantFestivalsPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -51,11 +52,7 @@ export default function ParticipantFestivalsPage() {
       <header className="relative z-10 bg-white/80 backdrop-blur-sm shadow-lg border-b border-white/20">
         <div className="max-w-md mx-auto px-3 py-3">
           <div className="flex items-center justify-between mb-1">
-            <Link href="/" prefetch={false}>
-              <Button variant="ghost" size="sm" className="text-gray-500 hover:text-slate-600 hover:bg-slate-100/50 rounded-full p-2 opacity-80 hover:opacity-100 transition-all duration-200">
-                <Home className="h-5 w-5" />
-              </Button>
-            </Link>
+            <HomeButton />
             <div className="flex-1"></div>
           </div>
           <div className="text-center">

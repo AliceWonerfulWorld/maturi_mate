@@ -13,6 +13,7 @@ export default function ApplicationsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFestival, setSelectedFestival] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
+  const [applicants, setApplicants] = useState(dummyApplicants);
 
   // 祭り単位の応募者データを集計
   const festivalApplications = useMemo(() => {
@@ -35,7 +36,7 @@ export default function ApplicationsPage() {
       });
 
       const tasksWithApplicants = relatedTasks.map(task => {
-        const taskApplicants = dummyApplicants.filter(applicant => 
+        const taskApplicants = applicants.filter(applicant => 
           task.applicants.some(app => app.userId === applicant.id)
         );
         return { task, applicants: taskApplicants };
@@ -55,7 +56,7 @@ export default function ApplicationsPage() {
     });
 
     return result;
-  }, []);
+  }, [applicants]);
 
   // フィルタリングされたデータ
   const filteredApplications = useMemo(() => {
@@ -77,11 +78,29 @@ export default function ApplicationsPage() {
   const handleApprove = (applicantId: string) => {
     // 実際のアプリではAPIを呼び出し
     console.log('承認:', applicantId);
+    
+    // 状態を更新
+    setApplicants(prev => 
+      prev.map(applicant => 
+        applicant.id === applicantId 
+          ? { ...applicant, status: 'approved' as const }
+          : applicant
+      )
+    );
   };
 
   const handleReject = (applicantId: string) => {
     // 実際のアプリではAPIを呼び出し
     console.log('却下:', applicantId);
+    
+    // 状態を更新
+    setApplicants(prev => 
+      prev.map(applicant => 
+        applicant.id === applicantId 
+          ? { ...applicant, status: 'rejected' as const }
+          : applicant
+      )
+    );
   };
 
   return (
@@ -313,16 +332,24 @@ const ApplicantCard = memo(function ApplicantCard({
         <div className="flex gap-2">
           <Button 
             size="sm" 
-            onClick={onApprove}
-            className="bg-slate-600 hover:bg-slate-700 text-white text-xs py-1 px-3"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onApprove();
+            }}
+            className="bg-slate-600 hover:bg-slate-700 text-white text-xs py-1 px-3 transition-colors duration-200"
           >
             承認
           </Button>
           <Button 
             size="sm" 
             variant="outline"
-            onClick={onReject}
-            className="border-gray-300 text-gray-600 hover:bg-gray-50 text-xs py-1 px-3"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onReject();
+            }}
+            className="border-gray-300 text-gray-600 hover:bg-gray-50 text-xs py-1 px-3 transition-colors duration-200"
           >
             却下
           </Button>

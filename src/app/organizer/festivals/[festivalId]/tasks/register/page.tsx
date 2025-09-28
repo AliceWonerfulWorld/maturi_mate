@@ -74,7 +74,7 @@ export default function FestivalTaskRegisterPage() {
         <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
           <CardContent className="p-6 text-center">
             <p className="text-gray-600">祭りが見つかりません</p>
-            <Link href="/organizer/festivals" className="text-amber-600 hover:text-amber-700 mt-2 inline-block">
+            <Link href="/organizer/festivals" className="text-slate-600 hover:text-slate-700 mt-2 inline-block">
               祭り一覧に戻る
             </Link>
           </CardContent>
@@ -87,9 +87,9 @@ export default function FestivalTaskRegisterPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-stone-50">
       {/* 背景装飾 */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-amber-300 rounded-full mix-blend-multiply filter blur-xl opacity-15 animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-orange-300 rounded-full mix-blend-multiply filter blur-xl opacity-15 animate-pulse delay-1000"></div>
-        <div className="absolute top-40 left-1/2 w-80 h-80 bg-amber-300 rounded-full mix-blend-multiply filter blur-xl opacity-15 animate-pulse delay-500"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-slate-300 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gray-300 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse delay-1000"></div>
+        <div className="absolute top-40 left-1/2 w-80 h-80 bg-slate-400 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse delay-500"></div>
       </div>
 
       {/* ヘッダー */}
@@ -97,14 +97,14 @@ export default function FestivalTaskRegisterPage() {
         <div className="max-w-md mx-auto px-3 py-3">
           <div className="flex items-center justify-between mb-1">
             <Link href={`/organizer/festivals/${festivalId}`} >
-              <Button variant="ghost" size="sm" className="text-gray-500 hover:text-amber-600 hover:bg-amber-100/50 rounded-full p-2 opacity-80 hover:opacity-100 transition-all duration-200">
+              <Button variant="ghost" size="sm" className="text-gray-500 hover:text-slate-600 hover:bg-slate-100/50 rounded-full p-2 opacity-80 hover:opacity-100 transition-all duration-200">
                 <ArrowLeft className="h-4 w-4" />
               </Button>
             </Link>
             <div className="flex-1"></div>
           </div>
           {/* パンくずリスト */}
-          <div className="mb-3">
+          <div className="mb-4">
             <Breadcrumb
               items={[
                 { label: "祭り一覧", href: "/organizer/festivals" },
@@ -116,10 +116,10 @@ export default function FestivalTaskRegisterPage() {
           </div>
           
           <div className="text-center">
-            <div className="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-r from-amber-600 to-orange-600 rounded-full mb-2 shadow-lg">
+            <div className="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-r from-slate-600 to-gray-700 rounded-full mb-2 shadow-lg">
               <Plus className="h-5 w-5 text-white" />
             </div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-amber-700 to-orange-700 bg-clip-text text-transparent mb-1">
+            <h1 className="text-xl font-bold bg-gradient-to-r from-slate-700 to-gray-800 bg-clip-text text-transparent mb-1">
               タスク登録
             </h1>
             <p className="text-xs text-gray-600 bg-white/50 backdrop-blur-sm px-3 py-1 rounded-full inline-block">
@@ -142,7 +142,7 @@ export default function FestivalTaskRegisterPage() {
               {/* タスク名 */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700 flex items-center">
-                  <Tag className="h-4 w-4 mr-2 text-amber-600" />
+                  <Tag className="h-4 w-4 mr-2 text-slate-600" />
                   タスク名
                 </label>
                 <Input
@@ -150,7 +150,7 @@ export default function FestivalTaskRegisterPage() {
                   placeholder="例: 夏祭り 屋台設営のお手伝い"
                   value={formData.title}
                   onChange={(e) => handleInputChange('title', e.target.value)}
-                  className="bg-white/80 border-amber-200 focus:border-amber-500 focus:ring-amber-500"
+                  className="bg-white/80 border-slate-200 focus:border-slate-500 focus:ring-slate-500"
                   required
                 />
               </div>
@@ -158,14 +158,14 @@ export default function FestivalTaskRegisterPage() {
               {/* 内容 */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700 flex items-center">
-                  <Tag className="h-4 w-4 mr-2 text-amber-600" />
+                  <Tag className="h-4 w-4 mr-2 text-slate-600" />
                   内容
                 </label>
                 <Textarea
                   placeholder="タスクの詳細を説明してください..."
                   value={formData.description}
                   onChange={(e) => handleInputChange('description', e.target.value)}
-                  className="bg-white/80 border-amber-200 focus:border-amber-500 focus:ring-amber-500 min-h-[100px] resize-none"
+                  className="bg-white/80 border-slate-200 focus:border-slate-500 focus:ring-slate-500 min-h-[100px] resize-none"
                   required
                 />
               </div>
@@ -174,20 +174,20 @@ export default function FestivalTaskRegisterPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700 flex items-center">
-                    <Calendar className="h-4 w-4 mr-2 text-amber-600" />
+                    <Calendar className="h-4 w-4 mr-2 text-slate-600" />
                     日付
                   </label>
                   <Input
                     type="date"
                     value={formData.date}
                     onChange={(e) => handleInputChange('date', e.target.value)}
-                    className="bg-white/80 border-amber-200 focus:border-amber-500 focus:ring-amber-500"
+                    className="bg-white/80 border-slate-200 focus:border-slate-500 focus:ring-slate-500"
                     required
                   />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700 flex items-center">
-                    <Clock className="h-4 w-4 mr-2 text-amber-600" />
+                    <Clock className="h-4 w-4 mr-2 text-slate-600" />
                     時間
                   </label>
                   <Input
@@ -195,7 +195,7 @@ export default function FestivalTaskRegisterPage() {
                     placeholder="例: 09:00-12:00"
                     value={formData.time}
                     onChange={(e) => handleInputChange('time', e.target.value)}
-                    className="bg-white/80 border-amber-200 focus:border-amber-500 focus:ring-amber-500"
+                    className="bg-white/80 border-slate-200 focus:border-slate-500 focus:ring-slate-500"
                     required
                   />
                 </div>
@@ -204,7 +204,7 @@ export default function FestivalTaskRegisterPage() {
               {/* 場所 */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700 flex items-center">
-                  <MapPin className="h-4 w-4 mr-2 text-amber-600" />
+                  <MapPin className="h-4 w-4 mr-2 text-slate-600" />
                   場所
                 </label>
                 <Input
@@ -212,14 +212,14 @@ export default function FestivalTaskRegisterPage() {
                   placeholder={festival.location}
                   value={formData.location}
                   onChange={(e) => handleInputChange('location', e.target.value)}
-                  className="bg-white/80 border-amber-200 focus:border-amber-500 focus:ring-amber-500"
+                  className="bg-white/80 border-slate-200 focus:border-slate-500 focus:ring-slate-500"
                 />
               </div>
 
               {/* 募集人数 */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700 flex items-center">
-                  <Users className="h-4 w-4 mr-2 text-amber-600" />
+                  <Users className="h-4 w-4 mr-2 text-slate-600" />
                   募集人数
                 </label>
                 <Input
@@ -228,7 +228,7 @@ export default function FestivalTaskRegisterPage() {
                   min="1"
                   value={formData.capacity}
                   onChange={(e) => handleInputChange('capacity', e.target.value)}
-                  className="bg-white/80 border-amber-200 focus:border-amber-500 focus:ring-amber-500"
+                  className="bg-white/80 border-slate-200 focus:border-slate-500 focus:ring-slate-500"
                   required
                 />
               </div>
@@ -236,7 +236,7 @@ export default function FestivalTaskRegisterPage() {
               {/* 報酬 */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700 flex items-center">
-                  <Gift className="h-4 w-4 mr-2 text-amber-600" />
+                  <Gift className="h-4 w-4 mr-2 text-slate-600" />
                   報酬・特典
                 </label>
                 <Input
@@ -244,14 +244,14 @@ export default function FestivalTaskRegisterPage() {
                   placeholder="例: お弁当付き、交通費支給"
                   value={formData.reward}
                   onChange={(e) => handleInputChange('reward', e.target.value)}
-                  className="bg-white/80 border-amber-200 focus:border-amber-500 focus:ring-amber-500"
+                  className="bg-white/80 border-slate-200 focus:border-slate-500 focus:ring-slate-500"
                 />
               </div>
 
               {/* タグ */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700 flex items-center">
-                  <Tag className="h-4 w-4 mr-2 text-amber-600" />
+                  <Tag className="h-4 w-4 mr-2 text-slate-600" />
                   タグ（カンマ区切り）
                 </label>
                 <Input
@@ -259,14 +259,14 @@ export default function FestivalTaskRegisterPage() {
                   placeholder="例: 屋台, 設営, 軽作業"
                   value={formData.tags}
                   onChange={(e) => handleInputChange('tags', e.target.value)}
-                  className="bg-white/80 border-amber-200 focus:border-amber-500 focus:ring-amber-500"
+                  className="bg-white/80 border-slate-200 focus:border-slate-500 focus:ring-slate-500"
                 />
               </div>
 
               {/* 登録ボタン */}
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                className="w-full bg-gradient-to-r from-slate-600 to-gray-700 hover:from-slate-700 hover:to-gray-800 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 タスクを登録
