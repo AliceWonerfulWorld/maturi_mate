@@ -60,7 +60,7 @@ export default function ParticipantHomePage() {
               <Calendar className="h-4 w-4 text-white" />
             </div>
             <h1 className="text-lg font-bold bg-gradient-to-r from-slate-700 to-gray-800 bg-clip-text text-transparent mb-1">
-              Matsuri Mate
+              タスク一覧
             </h1>
             <p className="text-xs text-gray-600 bg-white/50 backdrop-blur-sm px-2 py-0.5 rounded-full inline-block">
               参加者モード
