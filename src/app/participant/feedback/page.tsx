@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Star } from 'lucide-react';
 import Link from 'next/link';
 
+const MAX_COMMENT_LENGTH = 500;
+
 export default function ParticipantFeedbackPage() {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
@@ -16,8 +18,13 @@ export default function ParticipantFeedbackPage() {
       alert('評価を選択してください');
       return;
     }
-    if (comment.trim() === '') {
+    const trimmedComment = comment.trim();
+    if (trimmedComment === '') {
       alert('コメントを入力してください');
+      return;
+    }
+    if (trimmedComment.length > MAX_COMMENT_LENGTH) {
+      alert(`コメントは${MAX_COMMENT_LENGTH}文字以内で入力してください`);
       return;
     }
     setIsSubmitted(true);
@@ -106,16 +113,19 @@ export default function ParticipantFeedbackPage() {
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="タスクの感想や体験を教えてください..."
                 className="w-full h-32 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                maxLength={MAX_COMMENT_LENGTH}
               />
               <p className="text-xs text-gray-500 mt-1">
-                {comment.length}/500文字
+                残り{MAX_COMMENT_LENGTH - comment.length}文字（最大{MAX_COMMENT_LENGTH}文字）
               </p>
             </div>
 
             {/* 投稿ボタン */}
             <Button
               onClick={handleSubmit}
-              disabled={rating === 0 || comment.trim() === ''}
+              disabled={
+                rating === 0 || comment.trim() === '' || comment.trim().length > MAX_COMMENT_LENGTH
+              }
               className="w-full"
             >
               口コミを投稿する
