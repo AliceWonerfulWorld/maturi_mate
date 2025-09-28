@@ -4,7 +4,7 @@ import { useState, useMemo, memo, useCallback, lazy, Suspense } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Search, MapPin, Calendar, Clock, Eye, Plus, ArrowLeft, TrendingUp, Users } from 'lucide-react';
+import { Search, MapPin, Calendar, Clock, Eye, Plus, ArrowLeft, TrendingUp, Users, UserCheck } from 'lucide-react';
 import { dummyFestivals } from '@/lib/dummy-data';
 import { Festival } from '@/types';
 import Link from 'next/link';
@@ -102,6 +102,10 @@ export default function FestivalsListPage() {
           <Link href="/organizer/festivals" className="flex flex-col items-center py-2 px-3 rounded-full bg-gradient-to-r from-slate-600 to-gray-700 text-white shadow-lg">
             <Calendar className="h-5 w-5 mb-1" />
             <span className="text-xs font-medium">祭り管理</span>
+          </Link>
+          <Link href="/organizer/participants" className="flex flex-col items-center py-2 px-3 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300">
+            <UserCheck className="h-5 w-5 mb-1" />
+            <span className="text-xs font-medium">参加者評価</span>
           </Link>
           <Link href="/organizer/applications" className="flex flex-col items-center py-2 px-3 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300">
             <Users className="h-5 w-5 mb-1" />

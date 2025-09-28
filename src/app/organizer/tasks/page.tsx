@@ -3,12 +3,24 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Calendar, Clock, Users, Gift, Plus, UserCheck, Eye, ArrowLeft, TrendingUp } from 'lucide-react';
-import { dummyOrganizerTasks } from '@/lib/dummy-data';
+import { MapPin, Calendar, Clock, Users, Gift, Plus, UserCheck, Eye, ArrowLeft, TrendingUp, Flame } from 'lucide-react';
+import { dummyOrganizerTasks, dummyApplications } from '@/lib/dummy-data';
 import { OrganizerTask } from '@/types';
 import Link from 'next/link';
 
 export default function OrganizerTasksPage() {
+  // タスクの人気度を計算
+  const tasksWithPopularity = dummyOrganizerTasks.map(task => {
+    const applications = dummyApplications.filter(app => app.taskId === task.id);
+    const applicationRate = task.capacity > 0 ? (applications.length / task.capacity) * 100 : 0;
+    const isPopular = applicationRate >= 80; // 80%以上の応募率で人気タスク
+    
+    return {
+      ...task,
+      applicationRate: Math.round(applicationRate),
+      isPopular
+    };
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-100 via-gray-100 to-stone-100">
@@ -66,7 +78,7 @@ export default function OrganizerTasksPage() {
 
         {/* タスク一覧 */}
         <div className="space-y-4">
-          {dummyOrganizerTasks.map((task) => (
+          {tasksWithPopularity.map((task) => (
             <TaskCard 
               key={task.id} 
               task={task} 
@@ -97,15 +109,23 @@ export default function OrganizerTasksPage() {
 }
 
 function TaskCard({ task }: { 
-  task: OrganizerTask; 
+  task: OrganizerTask & { applicationRate: number; isPopular: boolean }; 
 }) {
   return (
     <Card className="group hover:shadow-lg transition-all duration-300 bg-white/90 backdrop-blur-sm border-0 shadow-xl">
       <CardHeader className="pb-3">
         <div className="flex justify-between items-start">
-          <CardTitle className="text-lg font-bold text-gray-800">
-            {task.title}
-          </CardTitle>
+          <div className="flex items-center gap-2">
+            <CardTitle className="text-lg font-bold text-gray-800">
+              {task.title}
+            </CardTitle>
+            {task.isPopular && (
+              <div className="flex items-center gap-1 bg-gradient-to-r from-orange-500 to-red-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                <Flame className="h-3 w-3" />
+                人気
+              </div>
+            )}
+          </div>
           <Badge variant={task.status === 'open' ? 'default' : 'secondary'}>
             {task.status === 'open' ? '募集中' : '終了'}
           </Badge>
@@ -149,7 +169,7 @@ function TaskCard({ task }: {
         </div>
         <div className="flex justify-between items-center mt-3">
           <div className="text-sm text-gray-600">
-            応募者: {task.applicants.length}人
+            応募者: {task.applicants.length}人 ({task.applicationRate}%)
           </div>
           <Link href="/organizer/applications" >
             <Button size="sm" className="bg-gradient-to-r from-slate-600 to-gray-700 hover:from-slate-700 hover:to-gray-800 text-white">

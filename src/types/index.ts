@@ -99,3 +99,20 @@ export interface FestivalReview {
     repliedBy: string;
   };
 }
+
+// 運営者から参加者への評価
+export interface OrganizerEvaluation {
+  id: string;
+  participantId: string; // 評価対象の参加者ID
+  organizerId: string; // 評価した運営者ID
+  organizerName: string; // 運営者名（冗長だが、現在のダミーデータ用）
+  taskId: string; // 関連するタスクID
+  taskTitle: string; // タスク名（冗長だが、表示用）
+  rating: number; // 1-5の評価
+  comment: string; // 評価コメント
+  status: 'excellent' | 'good' | 'average' | 'poor'; // 評価ステータス
+  createdAt: string;
+  // 拡張フィールド
+  skills?: string[]; // 評価されたスキル
+  improvements?: string[]; // 改善点
+}

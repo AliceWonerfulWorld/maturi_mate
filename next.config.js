@@ -20,6 +20,15 @@ const nextConfig = {
       transform: 'lucide-react/dist/esm/icons/{{member}}',
     },
   },
+  // Service Workerの無効化
+  async rewrites() {
+    return [
+      {
+        source: '/sw.js',
+        destination: '/api/empty',
+      },
+    ];
+  },
 }
 
 module.exports = nextConfig

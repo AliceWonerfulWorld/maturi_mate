@@ -4,7 +4,7 @@ import { useState, useMemo, memo, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Calendar, Clock, Users, Star, MessageCircle, ArrowLeft, Home } from 'lucide-react';
+import { MapPin, Calendar, Clock, Users, Star, MessageCircle, ArrowLeft, Home, Heart, Image, Award } from 'lucide-react';
 import { dummyFestivals, dummyFestivalReviews, dummyTasks } from '@/lib/dummy-data';
 import { Festival, FestivalReview, Task } from '@/types';
 import { ReviewSection } from '@/components/ReviewSection';
@@ -29,19 +29,23 @@ export default function FestivalDetailPage() {
     });
   }, [festival]);
 
-  // 祭りのレビューを取得
+  // 祭りのレビューを取得（状態管理）
+  const [reviews, setReviews] = useState<FestivalReview[]>(dummyFestivalReviews);
   const festivalReviews = useMemo(() => {
-    return dummyFestivalReviews.filter(review => review.festivalId === festivalId);
-  }, [festivalId]);
+    return reviews.filter(review => review.festivalId === festivalId);
+  }, [reviews, festivalId]);
 
   // 口コミ投稿ハンドラー（共通コンポーネント用）
   const handleReviewSubmit = (reviewData: Omit<FestivalReview, 'id' | 'createdAt'>) => {
     const newReview: FestivalReview = {
       ...reviewData,
+      festivalId: festivalId,
+      userId: '1', // 現在のユーザーID（ダミー）
       id: `review${Date.now()}`,
       createdAt: new Date().toISOString().split('T')[0]
     };
 
+    setReviews(prev => [...prev, newReview]);
     console.log('新しいレビューを投稿:', newReview);
     // 実際のアプリではここでAPIを呼び出してレビューを保存
   };
@@ -71,7 +75,7 @@ export default function FestivalDetailPage() {
       </div>
 
       {/* ヘッダー */}
-      <header className="relative z-10 bg-white/80 backdrop-blur-sm shadow-lg border-b border-white/20">
+      <header className="relative z-10 bg-white/90 backdrop-blur-sm shadow-lg border-b border-white/20">
         <div className="max-w-md mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-2">
             <Link href="/participant/festivals" prefetch={false}>
@@ -80,13 +84,29 @@ export default function FestivalDetailPage() {
               </Button>
             </Link>
             <div className="flex-1"></div>
+            <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600 hover:bg-red-50/50 rounded-full p-2">
+              <Heart className="h-4 w-4" />
+            </Button>
           </div>
           <div className="text-center">
-            <div className="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-r from-slate-600 to-gray-700 rounded-full mb-2 shadow-lg">
-              <Calendar className="h-5 w-5 text-white" />
+            <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-red-500 to-orange-500 rounded-full mb-3 shadow-lg">
+              <Calendar className="h-6 w-6 text-white" />
             </div>
-            <h1 className="text-xl font-bold text-slate-800 mb-1">{festival.name}</h1>
-            <p className="text-sm text-gray-600">{festival.location}</p>
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent mb-2">{festival.name}</h1>
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <MapPin className="h-4 w-4 text-gray-500" />
+              <p className="text-sm text-gray-600">{festival.location}</p>
+            </div>
+            <div className="flex items-center justify-center gap-4 text-xs text-gray-500">
+              <div className="flex items-center gap-1">
+                <Star className="h-3 w-3 text-yellow-400 fill-current" />
+                <span>4.8</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <MessageCircle className="h-3 w-3" />
+                <span>12件の口コミ</span>
+              </div>
+            </div>
           </div>
         </div>
       </header>
@@ -96,29 +116,29 @@ export default function FestivalDetailPage() {
         <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl mb-6">
           <CardHeader>
             <CardTitle className="text-lg font-bold text-gray-800 flex items-center">
-              <Calendar className="h-5 w-5 mr-2 text-slate-600" />
+              <Calendar className="h-5 w-5 mr-2 text-red-500" />
               祭り詳細
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 gap-4">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-gradient-to-r from-slate-500 to-gray-600 rounded-full flex items-center justify-center">
-                  <Calendar className="h-4 w-4 text-white" />
+                <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center shadow-md">
+                  <Calendar className="h-5 w-5 text-white" />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-700">開催日時</p>
-                  <p className="text-sm text-gray-600">{festival.date} {festival.time}</p>
+                  <p className="text-sm text-gray-600 font-medium">{festival.date} {festival.time}</p>
                 </div>
               </div>
               
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-gradient-to-r from-slate-500 to-gray-600 rounded-full flex items-center justify-center">
-                  <MapPin className="h-4 w-4 text-white" />
+                <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center shadow-md">
+                  <MapPin className="h-5 w-5 text-white" />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-700">開催場所</p>
-                  <p className="text-sm text-gray-600">{festival.location}</p>
+                  <p className="text-sm text-gray-600 font-medium">{festival.location}</p>
                 </div>
               </div>
             </div>
@@ -135,7 +155,7 @@ export default function FestivalDetailPage() {
           <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl mb-6">
             <CardHeader>
               <CardTitle className="text-lg font-bold text-gray-800 flex items-center">
-                <Users className="h-5 w-5 mr-2 text-slate-600" />
+                <Users className="h-5 w-5 mr-2 text-red-500" />
                 関連タスク ({relatedTasks.length})
               </CardTitle>
             </CardHeader>
@@ -181,7 +201,7 @@ export default function FestivalDetailPage() {
 // タスクカードコンポーネント
 const TaskCard = memo(function TaskCard({ task }: { task: Task }) {
   return (
-    <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-sm hover:shadow-md transition-all duration-300">
+    <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-105">
       <CardContent className="p-4">
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1">
@@ -192,25 +212,25 @@ const TaskCard = memo(function TaskCard({ task }: { task: Task }) {
         
         <div className="space-y-2">
           <div className="flex items-center text-xs text-gray-600">
-            <Calendar className="h-3 w-3 mr-1" />
+            <Calendar className="h-3 w-3 mr-1 text-red-500" />
             {task.date} {task.time}
           </div>
           <div className="flex items-center text-xs text-gray-600">
-            <MapPin className="h-3 w-3 mr-1" />
+            <MapPin className="h-3 w-3 mr-1 text-red-500" />
             {task.location}
           </div>
           <div className="flex items-center text-xs text-gray-600">
-            <Users className="h-3 w-3 mr-1" />
+            <Users className="h-3 w-3 mr-1 text-red-500" />
             {task.currentParticipants}/{task.capacity}人
           </div>
         </div>
         
         <div className="flex justify-between items-center mt-3">
-          <Badge variant="outline" className="text-xs bg-slate-50 text-slate-600 border-slate-200">
+          <Badge variant="outline" className="text-xs bg-red-50 text-red-600 border-red-200">
             {task.reward}
           </Badge>
           <Link href={`/participant/task/${task.id}`} prefetch={false}>
-            <Button size="sm" className="bg-gradient-to-r from-slate-600 to-gray-700 hover:from-slate-700 hover:to-gray-800 text-white text-xs px-3 py-1 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
+            <Button size="sm" className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white text-xs px-3 py-1 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-105">
               詳細を見る
             </Button>
           </Link>

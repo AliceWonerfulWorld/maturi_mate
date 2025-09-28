@@ -5,7 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Calendar, Clock, Users, Gift, ArrowLeft, ClipboardList } from 'lucide-react';
-import { dummyTasks, dummyFestivals } from '@/lib/dummy-data';
+import { dummyTasks, dummyFestivals, dummyApplications } from '@/lib/dummy-data';
+import { Application } from '@/types';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
@@ -14,6 +15,7 @@ export default function ParticipantTaskDetailPage() {
   const taskId = params.id as string;
   const task = dummyTasks.find(t => t.id === taskId);
   const [isApplied, setIsApplied] = useState(false);
+  const [applications, setApplications] = useState<Application[]>(dummyApplications);
 
   // タスクに関連する祭りを特定（場所と日付で関連付け）
   const relatedFestival = task ? dummyFestivals.find(festival => 
@@ -37,6 +39,15 @@ export default function ParticipantTaskDetailPage() {
   }
 
   const handleApply = () => {
+    const newApplication: Application = {
+      id: `app${Date.now()}`,
+      taskId: taskId,
+      userId: '1', // 現在のユーザーID（ダミー）
+      status: 'pending',
+      appliedAt: new Date().toISOString().split('T')[0]
+    };
+    
+    setApplications(prev => [...prev, newApplication]);
     setIsApplied(true);
     alert('タスクに応募しました！');
     // 実際のアプリケーションでは、ここでAPIを呼び出します

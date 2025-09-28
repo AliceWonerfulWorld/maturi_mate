@@ -92,9 +92,9 @@ export const ReviewSection = memo(function ReviewSection({
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2">
-        <MessageCircle className="h-5 w-5 text-slate-600" />
+        <MessageCircle className="h-5 w-5 text-red-500" />
         <h3 className="text-lg font-semibold text-slate-800">{title}</h3>
-        <Badge variant="outline" className="bg-slate-50 text-slate-600 border-slate-200">
+        <Badge variant="outline" className="bg-red-50 text-red-600 border-red-200">
           {reviews.length}件
         </Badge>
       </div>
@@ -121,7 +121,7 @@ export const ReviewSection = memo(function ReviewSection({
               onClick={() => setRatingFilter(null)}
               className={`text-xs px-2 py-1 ${
                 ratingFilter === null 
-                  ? "bg-slate-500 text-white" 
+                  ? "bg-red-500 text-white" 
                   : "bg-white/80 border-gray-200 text-gray-600"
               }`}
             >
@@ -135,7 +135,7 @@ export const ReviewSection = memo(function ReviewSection({
                 onClick={() => setRatingFilter(ratingFilter === rating ? null : rating)}
                 className={`text-xs px-2 py-1 ${
                   ratingFilter === rating 
-                    ? "bg-slate-500 text-white" 
+                    ? "bg-red-500 text-white" 
                     : "bg-white/80 border-gray-200 text-gray-600"
                 }`}
               >
@@ -152,7 +152,7 @@ export const ReviewSection = memo(function ReviewSection({
               onClick={() => setReviewSortBy('newest')}
               className={`text-xs px-2 py-1 ${
                 reviewSortBy === 'newest' 
-                  ? "bg-slate-500 text-white" 
+                  ? "bg-red-500 text-white" 
                   : "bg-white/80 border-gray-200 text-gray-600"
               }`}
             >
@@ -164,7 +164,7 @@ export const ReviewSection = memo(function ReviewSection({
               onClick={() => setReviewSortBy('rating')}
               className={`text-xs px-2 py-1 ${
                 reviewSortBy === 'rating' 
-                  ? "bg-slate-500 text-white" 
+                  ? "bg-red-500 text-white" 
                   : "bg-white/80 border-gray-200 text-gray-600"
               }`}
             >
@@ -249,7 +249,7 @@ export const ReviewSection = memo(function ReviewSection({
               </div>
               <Button 
                 type="submit" 
-                className="w-full bg-gradient-to-r from-slate-600 to-gray-700 hover:from-slate-700 hover:to-gray-800 text-white font-semibold py-2 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                className="w-full bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white font-semibold py-2 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
               >
                 口コミを投稿
               </Button>
@@ -264,34 +264,47 @@ export const ReviewSection = memo(function ReviewSection({
 // 個別のレビューカードコンポーネント
 const ReviewCard = memo(function ReviewCard({ review }: { review: FestivalReview }) {
   return (
-    <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-sm hover:shadow-md transition-all duration-300">
+    <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-105">
       <CardContent className="p-4">
         <div className="flex items-start justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-slate-500 to-gray-600 rounded-full flex items-center justify-center">
-              <User className="h-4 w-4 text-white" />
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center shadow-md">
+              <User className="h-5 w-5 text-white" />
             </div>
             <div>
-              <p className="font-medium text-slate-800 text-sm">{review.authorName}</p>
+              <p className="font-semibold text-slate-800 text-sm">{review.authorName}</p>
               <div className="flex items-center gap-1">
                 {[1, 2, 3, 4, 5].map((rating) => (
                   <Star
                     key={rating}
-                    className={`h-3 w-3 ${
+                    className={`h-4 w-4 ${
                       rating <= review.rating
                         ? 'text-yellow-400 fill-current'
                         : 'text-gray-300'
                     }`}
                   />
                 ))}
+                <span className="text-xs text-gray-500 ml-1">{review.rating}/5</span>
               </div>
             </div>
           </div>
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
             {new Date(review.createdAt).toLocaleDateString('ja-JP')}
           </span>
         </div>
-        <p className="text-gray-700 text-sm leading-relaxed">{review.comment}</p>
+        <p className="text-gray-700 text-sm leading-relaxed mb-3">{review.comment}</p>
+        
+        {/* SNSっぽいアクション */}
+        <div className="flex items-center gap-4 pt-2 border-t border-gray-100">
+          <Button variant="ghost" size="sm" className="text-gray-500 hover:text-red-500 hover:bg-red-50 p-1 h-auto">
+            <ThumbsUp className="h-4 w-4 mr-1" />
+            <span className="text-xs">いいね</span>
+          </Button>
+          <Button variant="ghost" size="sm" className="text-gray-500 hover:text-blue-500 hover:bg-blue-50 p-1 h-auto">
+            <MessageCircle className="h-4 w-4 mr-1" />
+            <span className="text-xs">返信</span>
+          </Button>
+        </div>
         
         {/* 拡張フィールドの表示（将来の拡張用） */}
         {review.tags && review.tags.length > 0 && (

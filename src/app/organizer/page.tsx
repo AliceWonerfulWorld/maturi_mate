@@ -5,7 +5,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Users, UserCheck, TrendingUp, ArrowRight, Plus, Eye } from 'lucide-react';
-import { dummyFestivals, dummyOrganizerTasks, dummyApplicants } from '@/lib/dummy-data';
+// Rechartsの型エラーを回避するため、any型でインポート
+const { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } = require('recharts') as any;
+import { dummyFestivals, dummyOrganizerTasks, dummyApplicants, dummyApplications, dummyFestivalReviews } from '@/lib/dummy-data';
 import { Festival, OrganizerTask } from '@/types';
 import Link from 'next/link';
 import HomeButton from '@/components/HomeButton';
@@ -37,6 +39,74 @@ export default function OrganizerDashboardPage() {
   const recentApplications = useMemo(() => {
     return dummyApplicants.filter(app => app.status === 'pending').slice(0, 5);
   }, []);
+
+  // 人気祭りランキング（応募率・口コミ平均点）
+  const popularFestivals = useMemo(() => {
+    return dummyFestivals.map(festival => {
+      // 祭りに関連するタスクの応募数を計算
+      const relatedTasks = dummyOrganizerTasks.filter(task => 
+        task.location === festival.location && task.date === festival.date
+      );
+      
+      const totalApplications = relatedTasks.reduce((sum, task) => {
+        return sum + dummyApplications.filter(app => app.taskId === task.id).length;
+      }, 0);
+      
+      const totalCapacity = relatedTasks.reduce((sum, task) => sum + task.capacity, 0);
+      const applicationRate = totalCapacity > 0 ? (totalApplications / totalCapacity) * 100 : 0;
+      
+      // 祭りの口コミ平均点を計算
+      const festivalReviews = dummyFestivalReviews.filter(review => review.festivalId === festival.id);
+      const averageRating = festivalReviews.length > 0 
+        ? festivalReviews.reduce((sum, review) => sum + review.rating, 0) / festivalReviews.length 
+        : 0;
+      
+      return {
+        ...festival,
+        applicationRate: Math.round(applicationRate),
+        averageRating: Math.round(averageRating * 10) / 10,
+        reviewCount: festivalReviews.length
+      };
+    }).sort((a, b) => {
+      // 応募率と口コミ平均点の重み付きスコアでソート
+      const scoreA = (a.applicationRate * 0.6) + (a.averageRating * 0.4);
+      const scoreB = (b.applicationRate * 0.6) + (b.averageRating * 0.4);
+      return scoreB - scoreA;
+    }).slice(0, 5);
+  }, []);
+
+  // 参加者属性分布（年齢層別）
+  const participantAgeDistribution = useMemo(() => {
+    const ageGroups = {
+      '10代': 0,
+      '20代': 0,
+      '30代': 0,
+      '40代以上': 0
+    };
+
+    dummyApplicants.forEach(applicant => {
+      if (applicant.age < 20) {
+        ageGroups['10代']++;
+      } else if (applicant.age < 30) {
+        ageGroups['20代']++;
+      } else if (applicant.age < 40) {
+        ageGroups['30代']++;
+      } else {
+        ageGroups['40代以上']++;
+      }
+    });
+
+    return Object.entries(ageGroups)
+      .map(([ageGroup, count]) => ({
+        name: ageGroup,
+        value: count,
+        percentage: Math.round((count / dummyApplicants.length) * 100)
+      }))
+      .filter(item => item.value > 0); // 0人の年齢層は表示しない
+  }, []);
+
+  // グラフの色設定
+  const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444'];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-100 via-gray-100 to-stone-100">
@@ -71,43 +141,47 @@ export default function OrganizerDashboardPage() {
       <div className="relative z-10 max-w-md mx-auto px-4 py-6 space-y-6 pb-32">
         {/* 統計カード */}
         <div className="grid grid-cols-2 gap-4">
-          <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
+          <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
             <CardContent className="p-4 text-center">
-              <div className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                <Calendar className="h-4 w-4 text-slate-600" />
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg">
+                <Calendar className="h-6 w-6 text-white" />
               </div>
-              <div className="text-2xl font-bold text-gray-800">{stats.totalFestivals}</div>
-              <div className="text-xs text-gray-600">登録祭り</div>
+              <div className="text-3xl font-bold text-gray-800 mb-1">{stats.totalFestivals}</div>
+              <div className="text-sm text-gray-600 font-medium">登録祭り</div>
+              <div className="text-xs text-green-600 mt-1">+2 今月</div>
             </CardContent>
           </Card>
           
-          <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
+          <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
             <CardContent className="p-4 text-center">
-              <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                <Users className="h-4 w-4 text-gray-600" />
+              <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg">
+                <Users className="h-6 w-6 text-white" />
               </div>
-              <div className="text-2xl font-bold text-gray-800">{stats.totalTasks}</div>
-              <div className="text-xs text-gray-600">登録タスク</div>
+              <div className="text-3xl font-bold text-gray-800 mb-1">{stats.totalTasks}</div>
+              <div className="text-sm text-gray-600 font-medium">登録タスク</div>
+              <div className="text-xs text-green-600 mt-1">+5 今月</div>
             </CardContent>
           </Card>
           
-          <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
+          <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
             <CardContent className="p-4 text-center">
-              <div className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                <UserCheck className="h-4 w-4 text-slate-600" />
+              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg">
+                <UserCheck className="h-6 w-6 text-white" />
               </div>
-              <div className="text-2xl font-bold text-gray-800">{stats.totalApplicants}</div>
-              <div className="text-xs text-gray-600">総応募者</div>
+              <div className="text-3xl font-bold text-gray-800 mb-1">{stats.totalApplicants}</div>
+              <div className="text-sm text-gray-600 font-medium">総応募者</div>
+              <div className="text-xs text-green-600 mt-1">+12 今月</div>
             </CardContent>
           </Card>
           
-          <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
+          <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
             <CardContent className="p-4 text-center">
-              <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                <Eye className="h-4 w-4 text-gray-600" />
+              <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg">
+                <Eye className="h-6 w-6 text-white" />
               </div>
-              <div className="text-2xl font-bold text-gray-800">{stats.pendingApplications}</div>
-              <div className="text-xs text-gray-600">未承認</div>
+              <div className="text-3xl font-bold text-gray-800 mb-1">{stats.pendingApplications}</div>
+              <div className="text-sm text-gray-600 font-medium">未承認</div>
+              <div className="text-xs text-orange-600 mt-1">要対応</div>
             </CardContent>
           </Card>
         </div>
@@ -115,12 +189,15 @@ export default function OrganizerDashboardPage() {
         {/* クイックアクション */}
         <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
           <CardHeader>
-            <CardTitle className="text-lg font-bold text-gray-800">クイックアクション</CardTitle>
+            <CardTitle className="text-lg font-bold text-gray-800 flex items-center">
+              <TrendingUp className="h-5 w-5 mr-2 text-blue-500" />
+              クイックアクション
+            </CardTitle>
             <CardDescription className="text-gray-600">よく使用する機能へのショートカット</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             <Link href="/organizer/festivals/register">
-              <Button className="w-full bg-gradient-to-r from-slate-600 to-gray-700 hover:from-slate-700 hover:to-gray-800 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+              <Button className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                 <Plus className="h-4 w-4 mr-2" />
                 新しい祭りを登録
               </Button>
@@ -128,18 +205,128 @@ export default function OrganizerDashboardPage() {
             
             <div className="grid grid-cols-2 gap-3">
               <Link href="/organizer/festivals">
-                <Button variant="outline" className="w-full bg-white/80 backdrop-blur-sm border-slate-200 text-slate-700 hover:bg-slate-50">
+                <Button variant="outline" className="w-full bg-white/80 backdrop-blur-sm border-blue-200 text-blue-700 hover:bg-blue-50 hover:border-blue-300 transition-all duration-300">
                   <Calendar className="h-4 w-4 mr-2" />
                   祭り一覧
                 </Button>
               </Link>
               
               <Link href="/organizer/tasks">
-                <Button variant="outline" className="w-full bg-white/80 backdrop-blur-sm border-gray-200 text-gray-700 hover:bg-gray-50">
+                <Button variant="outline" className="w-full bg-white/80 backdrop-blur-sm border-green-200 text-green-700 hover:bg-green-50 hover:border-green-300 transition-all duration-300">
                   <Users className="h-4 w-4 mr-2" />
                   タスク管理
                 </Button>
               </Link>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-3">
+              <Link href="/organizer/participants">
+                <Button variant="outline" className="w-full bg-white/80 backdrop-blur-sm border-purple-200 text-purple-700 hover:bg-purple-50 hover:border-purple-300 transition-all duration-300">
+                  <UserCheck className="h-4 w-4 mr-2" />
+                  参加者評価
+                </Button>
+              </Link>
+              
+              <Link href="/organizer/applications">
+                <Button variant="outline" className="w-full bg-white/80 backdrop-blur-sm border-orange-200 text-orange-700 hover:bg-orange-50 hover:border-orange-300 transition-all duration-300">
+                  <Eye className="h-4 w-4 mr-2" />
+                  応募者管理
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* 人気祭りランキング */}
+        <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
+          <CardHeader>
+            <CardTitle className="text-lg font-bold text-gray-800 flex items-center">
+              <TrendingUp className="h-5 w-5 mr-2 text-orange-500" />
+              人気祭りランキング
+            </CardTitle>
+            <CardDescription className="text-gray-600">応募率と口コミ平均点による人気度ランキング</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {popularFestivals.map((festival, index) => (
+                <div key={festival.id} className="flex items-center justify-between p-3 bg-gradient-to-r from-orange-50 to-yellow-50 rounded-lg border border-orange-100">
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full text-white font-bold text-sm">
+                      {index + 1}
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-gray-800 text-sm">{festival.name}</h4>
+                      <p className="text-xs text-gray-600">{festival.date} • {festival.location}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-orange-600 font-medium">{festival.applicationRate}%</span>
+                      <span className="text-gray-400">応募率</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-yellow-600 font-medium">{festival.averageRating}/5</span>
+                      <span className="text-gray-400">評価</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* 参加者属性分布 */}
+        <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
+          <CardHeader>
+            <CardTitle className="text-lg font-bold text-gray-800 flex items-center">
+              <Users className="h-5 w-5 mr-2 text-purple-500" />
+              参加者属性分布
+            </CardTitle>
+            <CardDescription className="text-gray-600">年齢層別の参加者分布</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={participantAgeDistribution}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, percentage }: { name: string; percentage: number }) => {
+                      // 短縮形のラベルを使用
+                      const shortName = name === '40代以上' ? '40代+' : name;
+                      return `${shortName}: ${percentage}%`;
+                    }}
+                    outerRadius={70}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {participantAgeDistribution.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    formatter={(value: number, name: string, props: any) => [
+                      `${value}人 (${props.payload.percentage}%)`,
+                      name
+                    ]}
+                  />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              {participantAgeDistribution.map((item, index) => (
+                <div key={item.name} className="flex items-center gap-2 text-sm">
+                  <div 
+                    className="w-3 h-3 rounded-full" 
+                    style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                  />
+                  <span className="text-gray-600">{item.name}</span>
+                  <span className="font-medium text-gray-800">{item.value}人</span>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
@@ -201,6 +388,10 @@ export default function OrganizerDashboardPage() {
           <Link href="/organizer/festivals" className="flex flex-col items-center py-2 px-3 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300">
             <Calendar className="h-5 w-5 mb-1" />
             <span className="text-xs font-medium">祭り管理</span>
+          </Link>
+          <Link href="/organizer/participants" className="flex flex-col items-center py-2 px-3 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300">
+            <UserCheck className="h-5 w-5 mb-1" />
+            <span className="text-xs font-medium">参加者評価</span>
           </Link>
           <Link href="/organizer/applications" className="flex flex-col items-center py-2 px-3 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300">
             <Users className="h-5 w-5 mb-1" />

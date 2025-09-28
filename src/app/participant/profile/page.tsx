@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { User, Calendar, Award, Star, MessageCircle, ArrowLeft, ThumbsUp, Users } from 'lucide-react';
-import { dummyUser, dummyFestivalReviews, dummyFestivals } from '@/lib/dummy-data';
+import { dummyUser, dummyFestivalReviews, dummyFestivals, dummyOrganizerEvaluations } from '@/lib/dummy-data';
 import Link from 'next/link';
 import { useMemo } from 'react';
 import HomeButton from '@/components/HomeButton';
@@ -31,6 +31,24 @@ export default function ParticipantProfilePage() {
       totalFestivals: uniqueFestivals
     };
   }, [userReviews]);
+
+  // 運営者からの評価を取得
+  const organizerEvaluations = useMemo(() => {
+    return dummyOrganizerEvaluations.filter(evaluation => evaluation.participantId === user.id);
+  }, [user.id]);
+
+  // 運営者評価の統計情報
+  const evaluationStats = useMemo(() => {
+    if (organizerEvaluations.length === 0) return { totalEvaluations: 0, averageRating: 0 };
+    
+    const totalEvaluations = organizerEvaluations.length;
+    const averageRating = organizerEvaluations.reduce((sum, evaluation) => sum + evaluation.rating, 0) / totalEvaluations;
+    
+    return {
+      totalEvaluations,
+      averageRating: Math.round(averageRating * 10) / 10
+    };
+  }, [organizerEvaluations]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-stone-50">
@@ -64,50 +82,87 @@ export default function ParticipantProfilePage() {
 
       <div className="max-w-md mx-auto px-4 py-6">
         {/* ユーザー情報 */}
-        <Card className="mb-6">
+        <Card className="mb-6 bg-gradient-to-br from-white to-red-50/30 border-0 shadow-xl">
           <CardHeader>
             <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-                <User className="h-8 w-8 text-blue-600" />
+              <div className="w-20 h-20 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                <User className="h-10 w-10 text-white" />
               </div>
-              <div>
-                <CardTitle className="text-xl">{user.name}</CardTitle>
-                <CardDescription>{user.age}歳</CardDescription>
+              <div className="flex-1">
+                <CardTitle className="text-2xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">{user.name}</CardTitle>
+                <CardDescription className="text-gray-600 font-medium">{user.age}歳</CardDescription>
+                <div className="flex items-center gap-2 mt-2">
+                  <div className="flex items-center gap-1">
+                    <Award className="h-4 w-4 text-yellow-500" />
+                    <span className="text-sm font-medium text-gray-700">レベル {user.level}</span>
+                  </div>
+                </div>
               </div>
             </div>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-gray-600 mb-4">{user.profile}</p>
-            <div className="flex items-center space-x-2">
-              <Badge variant="secondary">レベル {user.level}</Badge>
-              {user.badges.map(badge => (
-                <Badge key={badge} variant="outline">{badge}</Badge>
-              ))}
+            <p className="text-sm text-gray-600 mb-4 leading-relaxed">{user.profile}</p>
+            
+            {/* レベルプログレスバー */}
+            <div className="mb-4">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm font-medium text-gray-700">レベル進捗</span>
+                <span className="text-sm text-gray-500">{user.level * 10}/100 XP</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3">
+                <div 
+                  className="bg-gradient-to-r from-red-500 to-orange-500 h-3 rounded-full transition-all duration-500"
+                  style={{ width: `${(user.level * 10)}%` }}
+                ></div>
+              </div>
+            </div>
+            
+            {/* バッジ表示 */}
+            <div className="space-y-3">
+              <h4 className="text-sm font-semibold text-gray-700">獲得バッジ</h4>
+              <div className="flex flex-wrap gap-2">
+                {user.badges.map((badge, index) => (
+                  <Badge 
+                    key={badge} 
+                    variant="outline" 
+                    className="bg-gradient-to-r from-red-50 to-orange-50 text-red-700 border-red-200 hover:from-red-100 hover:to-orange-100 transition-all duration-300 transform hover:scale-105"
+                  >
+                    <Award className="h-3 w-3 mr-1" />
+                    {badge}
+                  </Badge>
+                ))}
+              </div>
             </div>
           </CardContent>
         </Card>
 
         {/* 統計情報 */}
         <div className="grid grid-cols-3 gap-3 mb-6">
-          <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-lg">
+          <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
             <CardContent className="p-4 text-center">
-              <Calendar className="h-5 w-5 mx-auto text-slate-600 mb-2" />
-              <div className="text-xl font-bold text-gray-800">12</div>
-              <div className="text-xs text-gray-600">参加回数</div>
+              <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-2 shadow-md">
+                <Calendar className="h-5 w-5 text-white" />
+              </div>
+              <div className="text-2xl font-bold text-gray-800">12</div>
+              <div className="text-xs text-gray-600 font-medium">参加回数</div>
             </CardContent>
           </Card>
-          <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-lg">
+          <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
             <CardContent className="p-4 text-center">
-              <MessageCircle className="h-5 w-5 mx-auto text-purple-600 mb-2" />
-              <div className="text-xl font-bold text-gray-800">{reviewStats.totalReviews}</div>
-              <div className="text-xs text-gray-600">口コミ投稿</div>
+              <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-2 shadow-md">
+                <MessageCircle className="h-5 w-5 text-white" />
+              </div>
+              <div className="text-2xl font-bold text-gray-800">{reviewStats.totalReviews}</div>
+              <div className="text-xs text-gray-600 font-medium">口コミ投稿</div>
             </CardContent>
           </Card>
-          <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-lg">
+          <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
             <CardContent className="p-4 text-center">
-              <Star className="h-5 w-5 mx-auto text-yellow-500 mb-2" />
-              <div className="text-xl font-bold text-gray-800">{reviewStats.averageRating}</div>
-              <div className="text-xs text-gray-600">平均評価</div>
+              <div className="w-10 h-10 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-2 shadow-md">
+                <Star className="h-5 w-5 text-white" />
+              </div>
+              <div className="text-2xl font-bold text-gray-800">{reviewStats.averageRating}</div>
+              <div className="text-xs text-gray-600 font-medium">平均評価</div>
             </CardContent>
           </Card>
         </div>
@@ -151,43 +206,64 @@ export default function ParticipantProfilePage() {
         )}
 
         {/* 運営者からの評価 */}
-        <Card className="mb-6 bg-white/90 backdrop-blur-sm border-0 shadow-xl">
-          <CardHeader>
-            <CardTitle className="flex items-center text-lg font-bold text-gray-800">
-              <ThumbsUp className="h-5 w-5 mr-2 text-green-600" />
-              運営者からの評価
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="bg-white/80 backdrop-blur-sm rounded-lg p-4 border border-gray-100">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <h4 className="font-semibold text-gray-800 text-sm">中央区まつり実行委員会</h4>
-                    <p className="text-xs text-gray-500">2024-08-15</p>
+        {organizerEvaluations.length > 0 && (
+          <Card className="mb-6 bg-white/90 backdrop-blur-sm border-0 shadow-xl">
+            <CardHeader>
+              <CardTitle className="flex items-center text-lg font-bold text-gray-800">
+                <ThumbsUp className="h-5 w-5 mr-2 text-green-600" />
+                運営者からの評価 ({organizerEvaluations.length}件)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {organizerEvaluations.map((evaluation) => (
+                  <div key={evaluation.id} className="bg-white/80 backdrop-blur-sm rounded-lg p-4 border border-gray-100">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <h4 className="font-semibold text-gray-800 text-sm">{evaluation.organizerName}</h4>
+                        <p className="text-xs text-gray-500">{evaluation.taskTitle}</p>
+                        <p className="text-xs text-gray-500">{evaluation.createdAt}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
+                          {Array.from({ length: evaluation.rating }, (_, i) => (
+                            <Star key={i} className="h-3 w-3 text-yellow-400 fill-current" />
+                          ))}
+                          {Array.from({ length: 5 - evaluation.rating }, (_, i) => (
+                            <Star key={i} className="h-3 w-3 text-gray-300" />
+                          ))}
+                        </div>
+                        <Badge className={`text-xs ${
+                          evaluation.status === 'excellent' ? 'bg-green-500 text-white' :
+                          evaluation.status === 'good' ? 'bg-blue-500 text-white' :
+                          evaluation.status === 'average' ? 'bg-yellow-500 text-white' :
+                          'bg-red-500 text-white'
+                        }`}>
+                          {evaluation.status === 'excellent' ? '優秀' :
+                           evaluation.status === 'good' ? '良好' :
+                           evaluation.status === 'average' ? '普通' : '要改善'}
+                        </Badge>
+                      </div>
+                    </div>
+                    <p className="text-sm text-gray-700 leading-relaxed">{evaluation.comment}</p>
+                    
+                    {evaluation.skills && evaluation.skills.length > 0 && (
+                      <div className="mt-3">
+                        <div className="flex flex-wrap gap-1">
+                          {evaluation.skills.map((skill, index) => (
+                            <Badge key={index} variant="outline" className="text-xs bg-green-50 text-green-600 border-green-200">
+                              {skill}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <Badge className="bg-green-500 text-white text-xs">優秀</Badge>
-                </div>
-                <p className="text-sm text-gray-700">
-                  「とても積極的で、他の参加者とも協力して作業を進めてくれました。また機会があれば一緒に活動したいです。」
-                </p>
+                ))}
               </div>
-              
-              <div className="bg-white/80 backdrop-blur-sm rounded-lg p-4 border border-gray-100">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <h4 className="font-semibold text-gray-800 text-sm">花火大会実行委員会</h4>
-                    <p className="text-xs text-gray-500">2024-08-20</p>
-                  </div>
-                  <Badge className="bg-blue-500 text-white text-xs">良好</Badge>
-                </div>
-                <p className="text-sm text-gray-700">
-                  「時間通りに集合し、最後まで責任を持って作業を完了してくれました。」
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
         {/* 最近の活動 */}
         <Card className="mb-24 bg-white/90 backdrop-blur-sm border-0 shadow-xl">
