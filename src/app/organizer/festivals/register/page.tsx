@@ -54,9 +54,9 @@ export default function FestivalRegisterPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-stone-50">
       {/* 背景装飾 */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-amber-300 rounded-full mix-blend-multiply filter blur-xl opacity-15 animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-orange-300 rounded-full mix-blend-multiply filter blur-xl opacity-15 animate-pulse delay-1000"></div>
-        <div className="absolute top-40 left-1/2 w-80 h-80 bg-amber-300 rounded-full mix-blend-multiply filter blur-xl opacity-15 animate-pulse delay-500"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-slate-300 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gray-300 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse delay-1000"></div>
+        <div className="absolute top-40 left-1/2 w-80 h-80 bg-slate-400 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse delay-500"></div>
       </div>
 
       {/* ヘッダー */}
@@ -64,17 +64,17 @@ export default function FestivalRegisterPage() {
         <div className="max-w-md mx-auto px-3 py-3">
           <div className="flex items-center justify-between mb-1">
             <Link href="/organizer/festivals" >
-              <Button variant="ghost" size="sm" className="text-gray-500 hover:text-amber-600 hover:bg-amber-100/50 rounded-full p-2 opacity-80 hover:opacity-100 transition-all duration-200">
+              <Button variant="ghost" size="sm" className="text-gray-500 hover:text-slate-600 hover:bg-slate-100/50 rounded-full p-2 opacity-80 hover:opacity-100 transition-all duration-200">
                 <ArrowLeft className="h-4 w-4" />
               </Button>
             </Link>
             <div className="flex-1"></div>
           </div>
           <div className="text-center">
-            <div className="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-r from-amber-600 to-orange-600 rounded-full mb-2 shadow-lg">
+            <div className="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-r from-slate-600 to-gray-700 rounded-full mb-2 shadow-lg">
               <Plus className="h-5 w-5 text-white" />
             </div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-amber-700 to-orange-700 bg-clip-text text-transparent mb-1">
+            <h1 className="text-xl font-bold bg-gradient-to-r from-slate-700 to-gray-800 bg-clip-text text-transparent mb-1">
               祭り登録
             </h1>
             <p className="text-xs text-gray-600 bg-white/50 backdrop-blur-sm px-3 py-1 rounded-full inline-block">
@@ -97,7 +97,7 @@ export default function FestivalRegisterPage() {
               {/* 祭り名 */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700 flex items-center">
-                  <FileText className="h-4 w-4 mr-2 text-amber-600" />
+                  <FileText className="h-4 w-4 mr-2 text-slate-600" />
                   祭り名
                 </label>
                 <Input
@@ -105,7 +105,7 @@ export default function FestivalRegisterPage() {
                   placeholder="例: 中央区夏祭り"
                   value={formData.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
-                  className="bg-white/80 border-amber-200 focus:border-amber-500 focus:ring-amber-500"
+                  className="bg-white/80 border-slate-200 focus:border-slate-500 focus:ring-slate-500"
                   required
                 />
               </div>
@@ -113,14 +113,14 @@ export default function FestivalRegisterPage() {
               {/* 開催日 */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700 flex items-center">
-                  <Calendar className="h-4 w-4 mr-2 text-amber-600" />
+                  <Calendar className="h-4 w-4 mr-2 text-slate-600" />
                   開催日
                 </label>
                 <Input
                   type="date"
                   value={formData.date}
                   onChange={(e) => handleInputChange('date', e.target.value)}
-                  className="bg-white/80 border-amber-200 focus:border-amber-500 focus:ring-amber-500"
+                  className="bg-white/80 border-slate-200 focus:border-slate-500 focus:ring-slate-500"
                   required
                 />
               </div>
@@ -128,7 +128,7 @@ export default function FestivalRegisterPage() {
               {/* 開催時間 */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700 flex items-center">
-                  <Calendar className="h-4 w-4 mr-2 text-amber-600" />
+                  <Calendar className="h-4 w-4 mr-2 text-slate-600" />
                   開催時間
                 </label>
                 <Input
@@ -136,7 +136,7 @@ export default function FestivalRegisterPage() {
                   placeholder="例: 09:00-21:00"
                   value={formData.time}
                   onChange={(e) => handleInputChange('time', e.target.value)}
-                  className="bg-white/80 border-amber-200 focus:border-amber-500 focus:ring-amber-500"
+                  className="bg-white/80 border-slate-200 focus:border-slate-500 focus:ring-slate-500"
                   required
                 />
               </div>
@@ -144,7 +144,7 @@ export default function FestivalRegisterPage() {
               {/* 開催場所 */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700 flex items-center">
-                  <MapPin className="h-4 w-4 mr-2 text-amber-600" />
+                  <MapPin className="h-4 w-4 mr-2 text-slate-600" />
                   開催場所
                 </label>
                 <Input
@@ -152,7 +152,7 @@ export default function FestivalRegisterPage() {
                   placeholder="例: 中央公園"
                   value={formData.location}
                   onChange={(e) => handleInputChange('location', e.target.value)}
-                  className="bg-white/80 border-amber-200 focus:border-amber-500 focus:ring-amber-500"
+                  className="bg-white/80 border-slate-200 focus:border-slate-500 focus:ring-slate-500"
                   required
                 />
               </div>
@@ -160,14 +160,14 @@ export default function FestivalRegisterPage() {
               {/* 詳細 */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700 flex items-center">
-                  <FileText className="h-4 w-4 mr-2 text-amber-600" />
+                  <FileText className="h-4 w-4 mr-2 text-slate-600" />
                   詳細
                 </label>
                 <Textarea
                   placeholder="祭りの詳細な説明を入力してください..."
                   value={formData.description}
                   onChange={(e) => handleInputChange('description', e.target.value)}
-                  className="bg-white/80 border-amber-200 focus:border-amber-500 focus:ring-amber-500 min-h-[100px] resize-none"
+                  className="bg-white/80 border-slate-200 focus:border-slate-500 focus:ring-slate-500 min-h-[100px] resize-none"
                   required
                 />
               </div>
@@ -175,7 +175,7 @@ export default function FestivalRegisterPage() {
               {/* 登録ボタン */}
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                className="w-full bg-gradient-to-r from-slate-600 to-gray-700 hover:from-slate-700 hover:to-gray-800 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 祭りを登録
