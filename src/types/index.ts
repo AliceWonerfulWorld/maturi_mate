@@ -58,3 +58,24 @@ export interface Applicant {
   appliedAt: string;
   status: 'pending' | 'approved' | 'rejected';
 }
+
+export interface Festival {
+  id: string;
+  name: string;
+  date: string;
+  time: string;
+  location: string;
+  description: string;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface FestivalReview {
+  id: string;
+  festivalId: string;
+  authorName: string;
+  comment: string;
+  rating: number;
+  createdAt: string;
+}

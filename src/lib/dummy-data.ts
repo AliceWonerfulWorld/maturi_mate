@@ -184,3 +184,56 @@ export const dummyApplicants: Applicant[] = [
     status: 'pending'
   }
 ];
+
+// 祭り関連ダミーデータ
+export const dummyFestivals: Festival[] = [
+  {
+    id: 'festival1',
+    name: '中央区夏祭り',
+    date: '2024-08-15',
+    time: '09:00-21:00',
+    location: '中央公園',
+    description: '地域の夏祭りです。屋台や花火、神輿など様々な催しがあります。',
+    createdBy: 'org1',
+    createdAt: '2024-08-01',
+    updatedAt: '2024-08-01'
+  },
+  {
+    id: 'festival2',
+    name: '秋の収穫祭',
+    date: '2024-10-10',
+    time: '10:00-18:00',
+    location: '神社境内',
+    description: '秋の収穫を祝う祭りです。神輿担ぎや伝統的な踊りを楽しめます。',
+    createdBy: 'org1',
+    createdAt: '2024-09-01',
+    updatedAt: '2024-09-01'
+  }
+];
+
+export const dummyFestivalReviews: FestivalReview[] = [
+  {
+    id: 'review1',
+    festivalId: 'festival1',
+    authorName: '田中太郎',
+    comment: 'とても楽しい祭りでした！屋台の料理も美味しく、花火も綺麗でした。',
+    rating: 5,
+    createdAt: '2024-08-16'
+  },
+  {
+    id: 'review2',
+    festivalId: 'festival1',
+    authorName: '佐藤花子',
+    comment: 'ボランティアとして参加しましたが、とても良い経験になりました。',
+    rating: 4,
+    createdAt: '2024-08-17'
+  },
+  {
+    id: 'review3',
+    festivalId: 'festival2',
+    authorName: '山田次郎',
+    comment: '神輿担ぎに参加して、地域の伝統を感じることができました。',
+    rating: 5,
+    createdAt: '2024-10-11'
+  }
+];
