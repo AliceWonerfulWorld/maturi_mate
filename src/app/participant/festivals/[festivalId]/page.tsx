@@ -114,30 +114,30 @@ export default function FestivalDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-stone-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-gray-100 to-stone-100">
       {/* 背景装飾 */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-15 animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-indigo-300 rounded-full mix-blend-multiply filter blur-xl opacity-15 animate-pulse delay-1000"></div>
-        <div className="absolute top-40 left-1/2 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-15 animate-pulse delay-500"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-slate-300 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gray-300 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse delay-1000"></div>
+        <div className="absolute top-40 left-1/2 w-80 h-80 bg-slate-400 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse delay-500"></div>
       </div>
 
       {/* ヘッダー */}
       <header className="relative z-10 bg-white/80 backdrop-blur-sm shadow-lg border-b border-white/20">
         <div className="max-w-md mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-2">
-            <Link href="/participant" prefetch={false}>
-              <Button variant="ghost" size="sm" className="text-gray-500 hover:text-blue-600 hover:bg-blue-100/50 rounded-full p-2 opacity-80 hover:opacity-100 transition-all duration-200">
+            <Link href="/participant/festivals" prefetch={false}>
+              <Button variant="ghost" size="sm" className="text-gray-500 hover:text-slate-600 hover:bg-slate-100/50 rounded-full p-2 opacity-80 hover:opacity-100 transition-all duration-200">
                 <ArrowLeft className="h-4 w-4" />
               </Button>
             </Link>
             <div className="flex-1"></div>
           </div>
           <div className="text-center">
-            <div className="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mb-2 shadow-lg">
+            <div className="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-r from-slate-600 to-gray-700 rounded-full mb-2 shadow-lg">
               <Calendar className="h-5 w-5 text-white" />
             </div>
-            <h1 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-1">
+            <h1 className="text-lg font-bold bg-gradient-to-r from-slate-700 to-gray-800 bg-clip-text text-transparent mb-1">
               {festival.name}
             </h1>
           </div>
@@ -153,12 +153,12 @@ export default function FestivalDetailPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
-              <div className="flex items-center text-sm text-gray-600 bg-blue-50/50 rounded-lg p-2">
-                <Calendar className="h-4 w-4 mr-2 text-blue-500" />
+              <div className="flex items-center text-sm text-gray-600 bg-slate-50/50 rounded-lg p-2">
+                <Calendar className="h-4 w-4 mr-2 text-slate-500" />
                 <span>{festival.date}</span>
               </div>
-              <div className="flex items-center text-sm text-gray-600 bg-purple-50/50 rounded-lg p-2">
-                <Clock className="h-4 w-4 mr-2 text-purple-500" />
+              <div className="flex items-center text-sm text-gray-600 bg-gray-50/50 rounded-lg p-2">
+                <Clock className="h-4 w-4 mr-2 text-gray-500" />
                 <span>{festival.time}</span>
               </div>
             </div>
@@ -174,7 +174,7 @@ export default function FestivalDetailPage() {
           <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
             <CardHeader>
               <CardTitle className="text-lg font-bold text-gray-800 flex items-center">
-                <Users className="h-5 w-5 mr-2 text-blue-600" />
+                <Users className="h-5 w-5 mr-2 text-slate-600" />
                 関連タスク
               </CardTitle>
             </CardHeader>
@@ -190,7 +190,7 @@ export default function FestivalDetailPage() {
         <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
           <CardHeader>
             <CardTitle className="text-lg font-bold text-gray-800 flex items-center">
-              <MessageCircle className="h-5 w-5 mr-2 text-purple-600" />
+              <MessageCircle className="h-5 w-5 mr-2 text-slate-600" />
               口コミ ({filteredReviews.length})
             </CardTitle>
             
@@ -203,7 +203,7 @@ export default function FestivalDetailPage() {
                   placeholder="口コミを検索..."
                   value={reviewSearchTerm}
                   onChange={(e) => setReviewSearchTerm(e.target.value)}
-                  className="pl-10 bg-white/80 border-gray-200 focus:border-purple-500 focus:ring-purple-500"
+                  className="pl-10 bg-white/80 border-gray-200 focus:border-slate-500 focus:ring-slate-500"
                 />
               </div>
               
@@ -217,7 +217,7 @@ export default function FestivalDetailPage() {
                     onClick={() => setRatingFilter(null)}
                     className={`text-xs px-2 py-1 ${
                       ratingFilter === null 
-                        ? "bg-purple-500 text-white" 
+                        ? "bg-slate-500 text-white" 
                         : "bg-white/80 border-gray-200 text-gray-600"
                     }`}
                   >
@@ -231,7 +231,7 @@ export default function FestivalDetailPage() {
                       onClick={() => setRatingFilter(ratingFilter === rating ? null : rating)}
                       className={`text-xs px-2 py-1 ${
                         ratingFilter === rating 
-                          ? "bg-purple-500 text-white" 
+                          ? "bg-slate-500 text-white" 
                           : "bg-white/80 border-gray-200 text-gray-600"
                       }`}
                     >
@@ -248,7 +248,7 @@ export default function FestivalDetailPage() {
                     onClick={() => setReviewSortBy('newest')}
                     className={`text-xs px-2 py-1 ${
                       reviewSortBy === 'newest' 
-                        ? "bg-purple-500 text-white" 
+                        ? "bg-slate-500 text-white" 
                         : "bg-white/80 border-gray-200 text-gray-600"
                     }`}
                   >
@@ -260,7 +260,7 @@ export default function FestivalDetailPage() {
                     onClick={() => setReviewSortBy('rating')}
                     className={`text-xs px-2 py-1 ${
                       reviewSortBy === 'rating' 
-                        ? "bg-purple-500 text-white" 
+                        ? "bg-slate-500 text-white" 
                         : "bg-white/80 border-gray-200 text-gray-600"
                     }`}
                   >
@@ -331,14 +331,14 @@ export default function FestivalDetailPage() {
                   placeholder="祭りの感想を入力してください..."
                   value={reviewForm.comment}
                   onChange={(e) => setReviewForm(prev => ({ ...prev, comment: e.target.value }))}
-                  className="bg-white/80 border-blue-200 focus:border-blue-500 focus:ring-blue-500 min-h-[80px] resize-none"
+                  className="bg-white/80 border-gray-200 focus:border-slate-500 focus:ring-slate-500 min-h-[80px] resize-none"
                   required
                 />
               </div>
 
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                className="w-full bg-gradient-to-r from-slate-600 to-gray-700 hover:from-slate-700 hover:to-gray-800 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
               >
                 <Send className="h-4 w-4 mr-2" />
                 口コミを投稿
@@ -354,7 +354,7 @@ export default function FestivalDetailPage() {
               <Calendar className="h-5 w-5 mb-1" />
               <span className="text-xs font-medium">タスク</span>
             </Link>
-            <Link href="/participant/festivals" className="flex flex-col items-center py-2 px-3 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg" prefetch={false}>
+            <Link href="/participant/festivals" className="flex flex-col items-center py-2 px-3 rounded-full bg-gradient-to-r from-slate-600 to-gray-700 text-white shadow-lg" prefetch={false}>
               <Home className="h-5 w-5 mb-1" />
               <span className="text-xs font-medium">祭り</span>
             </Link>

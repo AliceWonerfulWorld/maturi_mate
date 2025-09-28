@@ -51,9 +51,9 @@ export default function ParticipantFestivalsPage() {
       <header className="relative z-10 bg-white/80 backdrop-blur-sm shadow-lg border-b border-white/20">
         <div className="max-w-md mx-auto px-3 py-3">
           <div className="flex items-center justify-between mb-1">
-            <Link href="/participant" prefetch={false}>
+            <Link href="/" prefetch={false}>
               <Button variant="ghost" size="sm" className="text-gray-500 hover:text-slate-600 hover:bg-slate-100/50 rounded-full p-2 opacity-80 hover:opacity-100 transition-all duration-200">
-                <ArrowLeft className="h-5 w-5" />
+                <Home className="h-5 w-5" />
               </Button>
             </Link>
             <div className="flex-1"></div>
