@@ -97,7 +97,7 @@ export default function ParticipantHomePage() {
         </div>
 
         {/* タスク一覧 */}
-        <div className="space-y-4">
+        <div className="space-y-6 pb-24">
           {filteredTasks.map((task) => (
             <TaskCard key={task.id} task={task} />
           ))}
