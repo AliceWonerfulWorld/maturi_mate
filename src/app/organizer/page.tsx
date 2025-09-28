@@ -106,13 +106,17 @@ export default function OrganizerManagePage() {
         {/* ナビゲーション */}
         <nav className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-white/20 shadow-lg">
           <div className="max-w-md mx-auto flex justify-around py-3">
-            <Link href="/organizer" className="flex flex-col items-center py-2 px-3 rounded-full bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-lg" prefetch={false}>
+            <Link href="/organizer/dashboard" className="flex flex-col items-center py-2 px-3 rounded-full bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-lg" prefetch={false}>
               <UserCheck className="h-5 w-5 mb-1" />
-              <span className="text-xs font-medium">タスク管理</span>
+              <span className="text-xs font-medium">ダッシュボード</span>
             </Link>
             <Link href="/organizer/festivals" className="flex flex-col items-center py-2 px-3 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300" prefetch={false}>
               <Calendar className="h-5 w-5 mb-1" />
               <span className="text-xs font-medium">祭り管理</span>
+            </Link>
+            <Link href="/organizer/tasks" className="flex flex-col items-center py-2 px-3 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300" prefetch={false}>
+              <Users className="h-5 w-5 mb-1" />
+              <span className="text-xs font-medium">タスク管理</span>
             </Link>
           </div>
         </nav>

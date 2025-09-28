@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft, Plus, Calendar, Clock, MapPin, Users, Gift, Tag } from 'lucide-react';
 import Link from 'next/link';
 import { dummyFestivals } from '@/lib/dummy-data';
+import { Breadcrumb } from '@/components/ui/breadcrumb';
 
 export default function FestivalTaskRegisterPage() {
   const router = useRouter();
@@ -102,6 +103,18 @@ export default function FestivalTaskRegisterPage() {
             </Link>
             <div className="flex-1"></div>
           </div>
+          {/* パンくずリスト */}
+          <div className="mb-3">
+            <Breadcrumb
+              items={[
+                { label: "祭り一覧", href: "/organizer/festivals" },
+                { label: festival.name, href: `/organizer/festivals/${festivalId}` },
+                { label: "タスク登録", isActive: true }
+              ]}
+              className="justify-center"
+            />
+          </div>
+          
           <div className="text-center">
             <div className="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-r from-amber-600 to-orange-600 rounded-full mb-2 shadow-lg">
               <Plus className="h-5 w-5 text-white" />

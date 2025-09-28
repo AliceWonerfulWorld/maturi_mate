@@ -46,23 +46,23 @@ export default function ParticipantHomePage() {
 
       {/* ヘッダー */}
       <header className="relative z-10 bg-white/80 backdrop-blur-sm shadow-lg border-b border-white/20">
-        <div className="max-w-md mx-auto px-4 py-4">
-          <div className="flex items-center justify-between mb-2">
+        <div className="max-w-md mx-auto px-3 py-3">
+          <div className="flex items-center justify-between mb-1">
             <Link href="/" prefetch={false}>
-              <Button variant="ghost" size="sm" className="text-gray-500 hover:text-slate-600 hover:bg-slate-100/50 rounded-full p-3 opacity-80 hover:opacity-100 transition-all duration-200">
-                <Home className="h-6 w-6" />
+              <Button variant="ghost" size="sm" className="text-gray-500 hover:text-slate-600 hover:bg-slate-100/50 rounded-full p-2 opacity-80 hover:opacity-100 transition-all duration-200">
+                <Home className="h-5 w-5" />
               </Button>
             </Link>
             <div className="flex-1"></div>
           </div>
           <div className="text-center">
-            <div className="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-r from-slate-600 to-gray-700 rounded-full mb-2 shadow-lg">
-              <Calendar className="h-5 w-5 text-white" />
+            <div className="inline-flex items-center justify-center w-8 h-8 bg-gradient-to-r from-slate-600 to-gray-700 rounded-full mb-1 shadow-lg">
+              <Calendar className="h-4 w-4 text-white" />
             </div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-slate-700 to-gray-800 bg-clip-text text-transparent mb-1">
+            <h1 className="text-lg font-bold bg-gradient-to-r from-slate-700 to-gray-800 bg-clip-text text-transparent mb-1">
               Matsuri Mate
             </h1>
-            <p className="text-xs text-gray-600 bg-white/50 backdrop-blur-sm px-3 py-1 rounded-full inline-block">
+            <p className="text-xs text-gray-600 bg-white/50 backdrop-blur-sm px-2 py-0.5 rounded-full inline-block">
               参加者モード
             </p>
           </div>
@@ -127,15 +127,15 @@ export default function ParticipantHomePage() {
         {/* ナビゲーション */}
         <nav className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-white/20 shadow-lg">
           <div className="max-w-md mx-auto flex justify-around py-3">
-            <Link href="/participant" className="flex flex-col items-center py-2 px-3 rounded-full bg-gradient-to-r from-slate-600 to-gray-700 text-white shadow-lg" prefetch={false}>
+            <Link href="/participant" className="flex flex-col items-center py-2 px-4 rounded-full bg-gradient-to-r from-slate-600 to-gray-700 text-white shadow-lg" prefetch={false}>
               <Calendar className="h-5 w-5 mb-1" />
               <span className="text-xs font-medium">タスク</span>
             </Link>
-            <Link href="/participant/festivals" className="flex flex-col items-center py-2 px-3 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300" prefetch={false}>
+            <Link href="/participant/festivals" className="flex flex-col items-center py-2 px-4 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300" prefetch={false}>
               <Users className="h-5 w-5 mb-1" />
               <span className="text-xs font-medium">祭り</span>
             </Link>
-            <Link href="/participant/profile" className="flex flex-col items-center py-2 px-3 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300" prefetch={false}>
+            <Link href="/participant/profile" className="flex flex-col items-center py-2 px-4 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300" prefetch={false}>
               <Users className="h-5 w-5 mb-1" />
               <span className="text-xs font-medium">プロフィール</span>
             </Link>

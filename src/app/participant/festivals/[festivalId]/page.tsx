@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { MapPin, Calendar, Clock, Users, Star, MessageCircle, ArrowLeft, Send, Home } from 'lucide-react';
+import { MapPin, Calendar, Clock, Users, Star, MessageCircle, ArrowLeft, Send, Home, Search, Filter, ArrowUpDown } from 'lucide-react';
 import { dummyFestivals, dummyFestivalReviews, dummyTasks } from '@/lib/dummy-data';
 import { Festival, FestivalReview, Task } from '@/types';
 import Link from 'next/link';
@@ -22,6 +22,10 @@ export default function FestivalDetailPage() {
     rating: 5
   });
 
+  const [reviewSearchTerm, setReviewSearchTerm] = useState('');
+  const [reviewSortBy, setReviewSortBy] = useState<'newest' | 'oldest' | 'rating'>('newest');
+  const [ratingFilter, setRatingFilter] = useState<number | null>(null);
+
   // 祭り情報を取得
   const festival = useMemo(() => {
     return dummyFestivals.find(f => f.id === festivalId);
@@ -36,10 +40,38 @@ export default function FestivalDetailPage() {
     });
   }, [festival]);
 
-  // 祭りのレビューを取得
-  const reviews = useMemo(() => {
-    return dummyFestivalReviews.filter(review => review.festivalId === festivalId);
-  }, [festivalId]);
+  // 祭りのレビューを取得（フィルタ・検索・並び替え適用）
+  const filteredReviews = useMemo(() => {
+    let filtered = dummyFestivalReviews.filter(review => review.festivalId === festivalId);
+    
+    // 検索フィルタ
+    if (reviewSearchTerm) {
+      filtered = filtered.filter(review => 
+        review.authorName.toLowerCase().includes(reviewSearchTerm.toLowerCase()) ||
+        review.comment.toLowerCase().includes(reviewSearchTerm.toLowerCase())
+      );
+    }
+    
+    // 星評価フィルタ
+    if (ratingFilter !== null) {
+      filtered = filtered.filter(review => review.rating === ratingFilter);
+    }
+    
+    // 並び替え
+    switch (reviewSortBy) {
+      case 'newest':
+        filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        break;
+      case 'oldest':
+        filtered.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+        break;
+      case 'rating':
+        filtered.sort((a, b) => b.rating - a.rating);
+        break;
+    }
+    
+    return filtered;
+  }, [festivalId, reviewSearchTerm, reviewSortBy, ratingFilter]);
 
   const handleReviewSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -159,13 +191,100 @@ export default function FestivalDetailPage() {
           <CardHeader>
             <CardTitle className="text-lg font-bold text-gray-800 flex items-center">
               <MessageCircle className="h-5 w-5 mr-2 text-purple-600" />
-              口コミ ({reviews.length})
+              口コミ ({filteredReviews.length})
             </CardTitle>
+            
+            {/* 検索・フィルタ・並び替え */}
+            <div className="space-y-3 mt-4">
+              {/* 検索バー */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input
+                  placeholder="口コミを検索..."
+                  value={reviewSearchTerm}
+                  onChange={(e) => setReviewSearchTerm(e.target.value)}
+                  className="pl-10 bg-white/80 border-gray-200 focus:border-purple-500 focus:ring-purple-500"
+                />
+              </div>
+              
+              {/* フィルタ・並び替え */}
+              <div className="flex gap-2 overflow-x-auto">
+                {/* 星評価フィルタ */}
+                <div className="flex gap-1">
+                  <Button
+                    variant={ratingFilter === null ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setRatingFilter(null)}
+                    className={`text-xs px-2 py-1 ${
+                      ratingFilter === null 
+                        ? "bg-purple-500 text-white" 
+                        : "bg-white/80 border-gray-200 text-gray-600"
+                    }`}
+                  >
+                    すべて
+                  </Button>
+                  {[5, 4, 3, 2, 1].map((rating) => (
+                    <Button
+                      key={rating}
+                      variant={ratingFilter === rating ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setRatingFilter(ratingFilter === rating ? null : rating)}
+                      className={`text-xs px-2 py-1 ${
+                        ratingFilter === rating 
+                          ? "bg-purple-500 text-white" 
+                          : "bg-white/80 border-gray-200 text-gray-600"
+                      }`}
+                    >
+                      {rating}★
+                    </Button>
+                  ))}
+                </div>
+                
+                {/* 並び替え */}
+                <div className="flex gap-1 ml-2">
+                  <Button
+                    variant={reviewSortBy === 'newest' ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setReviewSortBy('newest')}
+                    className={`text-xs px-2 py-1 ${
+                      reviewSortBy === 'newest' 
+                        ? "bg-purple-500 text-white" 
+                        : "bg-white/80 border-gray-200 text-gray-600"
+                    }`}
+                  >
+                    最新
+                  </Button>
+                  <Button
+                    variant={reviewSortBy === 'rating' ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setReviewSortBy('rating')}
+                    className={`text-xs px-2 py-1 ${
+                      reviewSortBy === 'rating' 
+                        ? "bg-purple-500 text-white" 
+                        : "bg-white/80 border-gray-200 text-gray-600"
+                    }`}
+                  >
+                    高評価
+                  </Button>
+                </div>
+              </div>
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            {reviews.map((review) => (
-              <ReviewCard key={review.id} review={review} />
-            ))}
+            {filteredReviews.length > 0 ? (
+              filteredReviews.map((review) => (
+                <ReviewCard key={review.id} review={review} />
+              ))
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <MessageCircle className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                <p className="text-sm">
+                  {reviewSearchTerm || ratingFilter !== null 
+                    ? "条件に合う口コミが見つかりません" 
+                    : "まだ口コミがありません"}
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
