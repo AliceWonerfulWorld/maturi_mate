@@ -44,7 +44,6 @@ export interface Feedback {
 }
 
 export interface OrganizerTask extends Task {
-  applicants: Application[];
   createdAt: string;
   updatedAt: string;
 }

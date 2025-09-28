@@ -4,7 +4,7 @@ import { useState, useMemo, memo, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Search, MapPin, Calendar, Clock, Star, ArrowLeft, Users } from 'lucide-react';
+import { Search, MapPin, Calendar, Clock, Star, ArrowLeft, Users, MessageSquare } from 'lucide-react';
 import { dummyFestivals, dummyFestivalReviews } from '@/lib/dummy-data';
 import { Festival } from '@/types';
 import Link from 'next/link';
@@ -110,6 +110,10 @@ export default function ParticipantFestivalsPage() {
             <Link href="/participant/profile" className="flex flex-col items-center py-2 px-3 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300" prefetch={false}>
               <Users className="h-5 w-5 mb-1" />
               <span className="text-xs font-medium">プロフィール</span>
+            </Link>
+            <Link href="/participant/feedback" className="flex flex-col items-center py-2 px-3 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300" prefetch={false}>
+              <MessageSquare className="h-5 w-5 mb-1" />
+              <span className="text-xs font-medium">フィードバック</span>
             </Link>
           </div>
         </nav>

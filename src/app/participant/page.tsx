@@ -4,8 +4,8 @@ import { useState, useMemo, memo, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Search, MapPin, Calendar, Clock, Users, Gift } from 'lucide-react';
-import { dummyTasks } from '@/lib/dummy-data';
+import { Search, MapPin, Calendar, Clock, Users, Gift, MessageSquare } from 'lucide-react';
+import { dummyOrganizerTasks } from '@/lib/dummy-data';
 import { Task } from '@/types';
 import Link from 'next/link';
 import HomeButton from '@/components/HomeButton';
@@ -21,7 +21,7 @@ export default function ParticipantHomePage() {
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
   const filteredTasks = useMemo(() => {
-    return dummyTasks.filter(task => {
+    return dummyOrganizerTasks.filter(task => {
       const matchesSearch = task.title.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
                            task.description.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
       const matchesTag = !selectedTag || task.tags.includes(selectedTag);
@@ -30,7 +30,7 @@ export default function ParticipantHomePage() {
   }, [debouncedSearchTerm, selectedTag]);
 
   const allTags = useMemo(() => {
-    return Array.from(new Set(dummyTasks.flatMap(task => task.tags)));
+    return Array.from(new Set(dummyOrganizerTasks.flatMap(task => task.tags)));
   }, []);
 
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -152,6 +152,10 @@ export default function ParticipantHomePage() {
             <Link href="/participant/profile" className="flex flex-col items-center py-2 px-4 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300" prefetch={false}>
               <Users className="h-5 w-5 mb-1" />
               <span className="text-xs font-medium">プロフィール</span>
+            </Link>
+            <Link href="/participant/feedback" className="flex flex-col items-center py-2 px-4 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300" prefetch={false}>
+              <MessageSquare className="h-5 w-5 mb-1" />
+              <span className="text-xs font-medium">フィードバック</span>
             </Link>
           </div>
         </nav>

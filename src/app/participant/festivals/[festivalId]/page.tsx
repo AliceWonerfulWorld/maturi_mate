@@ -4,9 +4,10 @@ import { useState, useMemo, memo, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Calendar, Clock, Users, Star, MessageCircle, ArrowLeft, Home, Heart, Image, Award } from 'lucide-react';
-import { dummyFestivals, dummyFestivalReviews, dummyTasks } from '@/lib/dummy-data';
+import { MapPin, Calendar, Clock, Users, Star, MessageCircle, ArrowLeft, Home, Heart, Image, Award, MessageSquare } from 'lucide-react';
+import { dummyFestivals, dummyFestivalReviews, dummyOrganizerTasks } from '@/lib/dummy-data';
 import { Festival, FestivalReview, Task } from '@/types';
+import { getRelatedTasks } from '@/lib/relations';
 import { ReviewSection } from '@/components/ReviewSection';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -20,13 +21,10 @@ export default function FestivalDetailPage() {
     return dummyFestivals.find(f => f.id === festivalId);
   }, [festivalId]);
 
-  // 祭りに関連するタスクを取得
+  // 祭りに関連するタスクを取得（統一されたロジック）
   const relatedTasks = useMemo(() => {
-    return dummyTasks.filter(task => {
-      // 簡単な関連付け（実際のアプリではより複雑なロジック）
-      return task.location === festival?.location || 
-             task.title.toLowerCase().includes(festival?.name.toLowerCase().split(' ')[0] || '');
-    });
+    if (!festival) return [];
+    return getRelatedTasks(festival, dummyOrganizerTasks, false);
   }, [festival]);
 
   // 祭りのレビューを取得（状態管理）
@@ -190,6 +188,10 @@ export default function FestivalDetailPage() {
             <Link href="/participant/profile" className="flex flex-col items-center py-2 px-3 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300" prefetch={false}>
               <MessageCircle className="h-5 w-5 mb-1" />
               <span className="text-xs font-medium">プロフィール</span>
+            </Link>
+            <Link href="/participant/feedback" className="flex flex-col items-center py-2 px-3 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300" prefetch={false}>
+              <MessageSquare className="h-5 w-5 mb-1" />
+              <span className="text-xs font-medium">フィードバック</span>
             </Link>
           </div>
         </nav>

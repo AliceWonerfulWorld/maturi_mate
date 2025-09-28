@@ -5,8 +5,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Search, Users, UserCheck, Calendar, ArrowLeft, Filter, TrendingUp } from 'lucide-react';
-import { dummyFestivals, dummyOrganizerTasks, dummyApplicants } from '@/lib/dummy-data';
-import { Festival, OrganizerTask, Applicant } from '@/types';
+import { dummyFestivals, dummyOrganizerTasks, dummyApplicants, dummyApplications } from '@/lib/dummy-data';
+import { Festival, OrganizerTask, Applicant, Application } from '@/types';
+import { getRelatedTasks } from '@/lib/relations';
 import Link from 'next/link';
 
 export default function ApplicationsPage() {
@@ -28,24 +29,24 @@ export default function ApplicationsPage() {
     }> = [];
 
     dummyFestivals.forEach(festival => {
-      // 祭りに関連するタスクを取得
-      const relatedTasks = dummyOrganizerTasks.filter(task => {
-        // 簡単な関連付け（実際のアプリではより複雑なロジック）
-        return task.location === festival.location || 
-               task.title.toLowerCase().includes(festival.name.toLowerCase().split(' ')[0] || '');
-      });
+      // 祭りに関連するタスクを取得（統一されたロジック）
+      const relatedTasks = getRelatedTasks(festival, dummyOrganizerTasks, false);
 
       const tasksWithApplicants = relatedTasks.map(task => {
-        const taskApplicants = applicants.filter(applicant => 
-          task.applicants.some(app => app.userId === applicant.id)
-        );
+        // dummyApplicationsから該当タスクの応募を取得
+        const taskApplications = dummyApplications.filter(app => app.taskId === task.id);
+        // 応募者情報を取得
+        const taskApplicants = taskApplications.map(app => 
+          applicants.find(applicant => applicant.id === app.userId)
+        ).filter(Boolean) as Applicant[];
         return { task, applicants: taskApplicants };
       });
 
       const totalApplicants = tasksWithApplicants.reduce((sum, item) => sum + item.applicants.length, 0);
-      const pendingCount = tasksWithApplicants.reduce((sum, item) => 
-        sum + item.applicants.filter(app => app.status === 'pending').length, 0
-      );
+      const pendingCount = tasksWithApplicants.reduce((sum, item) => {
+        const taskApplications = dummyApplications.filter(app => app.taskId === item.task.id);
+        return sum + taskApplications.filter(app => app.status === 'pending').length;
+      }, 0);
 
       result.push({
         festival,
@@ -201,15 +202,19 @@ export default function ApplicationsPage() {
       {/* ナビゲーション */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-white/20 shadow-lg z-50">
         <div className="max-w-md mx-auto flex justify-around py-3">
-          <Link href="/organizer" className="flex flex-col items-center py-2 px-3 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300" >
+          <Link href="/organizer" className="flex flex-col items-center py-2 px-3 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300">
             <TrendingUp className="h-5 w-5 mb-1" />
             <span className="text-xs font-medium">ダッシュボード</span>
           </Link>
-          <Link href="/organizer/festivals" className="flex flex-col items-center py-2 px-3 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300" >
+          <Link href="/organizer/festivals" className="flex flex-col items-center py-2 px-3 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300">
             <Calendar className="h-5 w-5 mb-1" />
             <span className="text-xs font-medium">祭り管理</span>
           </Link>
-          <Link href="/organizer/applications" className="flex flex-col items-center py-2 px-3 rounded-full bg-gradient-to-r from-slate-600 to-gray-700 text-white shadow-lg" >
+          <Link href="/organizer/participants" className="flex flex-col items-center py-2 px-3 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300">
+            <UserCheck className="h-5 w-5 mb-1" />
+            <span className="text-xs font-medium">参加者評価</span>
+          </Link>
+          <Link href="/organizer/applications" className="flex flex-col items-center py-2 px-3 rounded-full bg-gradient-to-r from-slate-600 to-gray-700 text-white shadow-lg">
             <Users className="h-5 w-5 mb-1" />
             <span className="text-xs font-medium">応募者管理</span>
           </Link>
@@ -267,14 +272,22 @@ const FestivalApplicationCard = memo(function FestivalApplicationCard({
             
             {applicants.length > 0 ? (
               <div className="space-y-3">
-                {applicants.map((applicant) => (
-                  <ApplicantCard
-                    key={applicant.id}
-                    applicant={applicant}
-                    onApprove={() => onApprove(applicant.id)}
-                    onReject={() => onReject(applicant.id)}
-                  />
-                ))}
+                {applicants.map((applicant) => {
+                  const application = dummyApplications.find(app => 
+                    app.userId === applicant.id && app.taskId === task.id
+                  );
+                  if (!application) return null;
+                  
+                  return (
+                    <ApplicantCard
+                      key={applicant.id}
+                      applicant={applicant}
+                      application={application}
+                      onApprove={() => onApprove(applicant.id)}
+                      onReject={() => onReject(applicant.id)}
+                    />
+                  );
+                })}
               </div>
             ) : (
               <div className="text-center py-4 text-gray-500">
@@ -291,10 +304,12 @@ const FestivalApplicationCard = memo(function FestivalApplicationCard({
 
 const ApplicantCard = memo(function ApplicantCard({ 
   applicant, 
+  application,
   onApprove, 
   onReject 
 }: { 
-  applicant: Applicant; 
+  applicant: Applicant;
+  application: Application;
   onApprove: () => void; 
   onReject: () => void;
 }) {
@@ -306,15 +321,15 @@ const ApplicantCard = memo(function ApplicantCard({
           <p className="text-xs text-gray-600">{applicant.age}歳 | レベル {applicant.level}</p>
         </div>
         <Badge 
-          variant={applicant.status === 'pending' ? 'default' : 'secondary'}
+          variant={application.status === 'pending' ? 'default' : 'secondary'}
           className={`text-xs ${
-            applicant.status === 'pending' ? 'bg-gray-500 text-white' :
-            applicant.status === 'approved' ? 'bg-slate-500 text-white' :
+            application.status === 'pending' ? 'bg-gray-500 text-white' :
+            application.status === 'approved' ? 'bg-slate-500 text-white' :
             'bg-gray-400 text-white'
           }`}
         >
-          {applicant.status === 'pending' ? '承認待ち' : 
-           applicant.status === 'approved' ? '承認済み' : '却下済み'}
+          {application.status === 'pending' ? '承認待ち' : 
+           application.status === 'approved' ? '承認済み' : '却下済み'}
         </Badge>
       </div>
       
@@ -328,7 +343,7 @@ const ApplicantCard = memo(function ApplicantCard({
         ))}
       </div>
       
-      {applicant.status === 'pending' && (
+      {application.status === 'pending' && (
         <div className="flex gap-2">
           <Button 
             size="sm" 

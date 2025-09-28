@@ -4,24 +4,22 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Calendar, Clock, Users, Gift, ArrowLeft, ClipboardList } from 'lucide-react';
-import { dummyTasks, dummyFestivals, dummyApplications } from '@/lib/dummy-data';
+import { MapPin, Calendar, Clock, Users, Gift, ArrowLeft, ClipboardList, MessageSquare } from 'lucide-react';
+import { dummyOrganizerTasks, dummyFestivals, dummyApplications } from '@/lib/dummy-data';
 import { Application } from '@/types';
+import { getRelatedFestivals } from '@/lib/relations';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
 export default function ParticipantTaskDetailPage() {
   const params = useParams();
   const taskId = params.id as string;
-  const task = dummyTasks.find(t => t.id === taskId);
+  const task = dummyOrganizerTasks.find(t => t.id === taskId);
   const [isApplied, setIsApplied] = useState(false);
   const [applications, setApplications] = useState<Application[]>(dummyApplications);
 
-  // タスクに関連する祭りを特定（場所と日付で関連付け）
-  const relatedFestival = task ? dummyFestivals.find(festival => 
-    festival.location === task.location && 
-    festival.date === task.date
-  ) : null;
+  // タスクに関連する祭りを特定（統一されたロジック）
+  const relatedFestival = task ? getRelatedFestivals(task, dummyFestivals, true)[0] : null;
 
   if (!task) {
     return (
@@ -194,6 +192,10 @@ export default function ParticipantTaskDetailPage() {
           <Link href="/participant/profile" className="flex flex-col items-center py-2 px-4 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300">
             <Users className="h-5 w-5 mb-1" />
             <span className="text-xs font-medium">プロフィール</span>
+          </Link>
+          <Link href="/participant/feedback" className="flex flex-col items-center py-2 px-4 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300">
+            <MessageSquare className="h-5 w-5 mb-1" />
+            <span className="text-xs font-medium">フィードバック</span>
           </Link>
         </div>
       </nav>

@@ -3,7 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { User, Calendar, Award, Star, MessageCircle, ArrowLeft, ThumbsUp, Users } from 'lucide-react';
+import { User, Calendar, Award, Star, MessageCircle, ArrowLeft, ThumbsUp, Users, MessageSquare } from 'lucide-react';
 import { dummyUser, dummyFestivalReviews, dummyFestivals, dummyOrganizerEvaluations } from '@/lib/dummy-data';
 import Link from 'next/link';
 import { useMemo } from 'react';
@@ -307,6 +307,10 @@ export default function ParticipantProfilePage() {
             <Link href="/participant/profile" className="flex flex-col items-center py-2 px-3 rounded-full bg-gradient-to-r from-slate-600 to-gray-700 text-white shadow-lg" prefetch={false}>
               <User className="h-5 w-5 mb-1" />
               <span className="text-xs font-medium">プロフィール</span>
+            </Link>
+            <Link href="/participant/feedback" className="flex flex-col items-center py-2 px-3 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300" prefetch={false}>
+              <MessageSquare className="h-5 w-5 mb-1" />
+              <span className="text-xs font-medium">フィードバック</span>
             </Link>
           </div>
         </nav>

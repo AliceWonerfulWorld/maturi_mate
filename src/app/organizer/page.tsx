@@ -8,6 +8,7 @@ import { Calendar, Users, UserCheck, TrendingUp, ArrowRight, Plus, Eye } from 'l
 // Rechartsの型エラーを回避するため、any型でインポート
 const { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } = require('recharts') as any;
 import { dummyFestivals, dummyOrganizerTasks, dummyApplicants, dummyApplications, dummyFestivalReviews } from '@/lib/dummy-data';
+import { getRelatedTasks } from '@/lib/relations';
 import { Festival, OrganizerTask } from '@/types';
 import Link from 'next/link';
 import HomeButton from '@/components/HomeButton';
@@ -43,10 +44,8 @@ export default function OrganizerDashboardPage() {
   // 人気祭りランキング（応募率・口コミ平均点）
   const popularFestivals = useMemo(() => {
     return dummyFestivals.map(festival => {
-      // 祭りに関連するタスクの応募数を計算
-      const relatedTasks = dummyOrganizerTasks.filter(task => 
-        task.location === festival.location && task.date === festival.date
-      );
+      // 祭りに関連するタスクの応募数を計算（統一されたロジック）
+      const relatedTasks = getRelatedTasks(festival, dummyOrganizerTasks, true);
       
       const totalApplications = relatedTasks.reduce((sum, task) => {
         return sum + dummyApplications.filter(app => app.taskId === task.id).length;

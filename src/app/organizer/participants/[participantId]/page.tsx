@@ -7,8 +7,9 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Users, Star, Award, ArrowLeft, MessageSquare, ThumbsUp, UserCheck, TrendingUp, Calendar } from 'lucide-react';
-import { dummyApplicants, dummyOrganizerEvaluations, dummyTasks } from '@/lib/dummy-data';
+import { dummyApplicants, dummyOrganizerEvaluations, dummyOrganizerTasks, dummyFestivals } from '@/lib/dummy-data';
 import { Applicant, OrganizerEvaluation, Task } from '@/types';
+import { getRelatedTasks } from '@/lib/relations';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
@@ -21,7 +22,9 @@ export default function ParticipantEvaluationPage() {
     comment: '',
     status: 'good' as 'excellent' | 'good' | 'average' | 'poor',
     skills: [] as string[],
-    improvements: [] as string[]
+    improvements: [] as string[],
+    festivalId: '',
+    taskId: ''
   });
 
   // 参加者情報を取得
@@ -36,11 +39,21 @@ export default function ParticipantEvaluationPage() {
 
   // 参加者の関連タスクを取得
   const relatedTasks = useMemo(() => {
-    return dummyTasks.filter(task => {
+    return dummyOrganizerTasks.filter(task => {
       // 簡単な関連付け（実際のアプリではより複雑なロジック）
       return task.createdBy === 'org1'; // 現在の運営者のタスク
     });
   }, []);
+
+  // 選択された祭りに関連するタスクを取得（統一されたロジック）
+  const relatedTasksForFestival = useMemo(() => {
+    if (!evaluationForm.festivalId) return dummyOrganizerTasks;
+    
+    const selectedFestival = dummyFestivals.find(f => f.id === evaluationForm.festivalId);
+    if (!selectedFestival) return dummyOrganizerTasks;
+    
+    return getRelatedTasks(selectedFestival, dummyOrganizerTasks, false);
+  }, [evaluationForm.festivalId]);
 
   const handleSubmitEvaluation = (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,13 +64,17 @@ export default function ParticipantEvaluationPage() {
     }
 
     // 新しい評価を作成
+    // 選択された祭りとタスクの情報を取得
+    const selectedFestival = dummyFestivals.find(f => f.id === evaluationForm.festivalId);
+    const selectedTask = dummyOrganizerTasks.find(t => t.id === evaluationForm.taskId);
+    
     const newEvaluation: OrganizerEvaluation = {
       id: `eval${Date.now()}`,
       participantId: participantId,
       organizerId: 'org1', // 現在の運営者
       organizerName: '中央区まつり実行委員会',
-      taskId: relatedTasks[0]?.id || '1',
-      taskTitle: relatedTasks[0]?.title || 'タスク',
+      taskId: selectedTask?.id || '1',
+      taskTitle: selectedTask?.title || 'タスク',
       rating: evaluationForm.rating,
       comment: evaluationForm.comment,
       status: evaluationForm.status,
@@ -75,7 +92,9 @@ export default function ParticipantEvaluationPage() {
       comment: '',
       status: 'good',
       skills: [],
-      improvements: []
+      improvements: [],
+      festivalId: '',
+      taskId: ''
     });
   };
 
@@ -223,6 +242,47 @@ export default function ParticipantEvaluationPage() {
               </div>
 
               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">関連祭り</label>
+                <select
+                  value={evaluationForm.festivalId}
+                  onChange={(e) => setEvaluationForm({
+                    ...evaluationForm, 
+                    festivalId: e.target.value,
+                    taskId: '' // 祭り選択時にタスク選択をリセット
+                  })}
+                  className="w-full p-2 border border-gray-200 rounded-lg bg-white/80 focus:border-blue-500 focus:ring-blue-500"
+                  required
+                >
+                  <option value="">祭りを選択してください</option>
+                  {dummyFestivals.map(festival => (
+                    <option key={festival.id} value={festival.id}>
+                      {festival.name} ({festival.date})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">関連タスク</label>
+                <select
+                  value={evaluationForm.taskId}
+                  onChange={(e) => setEvaluationForm({...evaluationForm, taskId: e.target.value})}
+                  className="w-full p-2 border border-gray-200 rounded-lg bg-white/80 focus:border-blue-500 focus:ring-blue-500"
+                  disabled={!evaluationForm.festivalId}
+                  required
+                >
+                  <option value="">
+                    {evaluationForm.festivalId ? 'タスクを選択してください' : 'まず祭りを選択してください'}
+                  </option>
+                  {relatedTasksForFestival.map(task => (
+                    <option key={task.id} value={task.id}>
+                      {task.title} ({task.date})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">評価コメント</label>
                 <Textarea
                   value={evaluationForm.comment}
@@ -273,6 +333,11 @@ export default function ParticipantEvaluationPage() {
 
 // 評価カードコンポーネント
 const EvaluationCard = memo(function EvaluationCard({ evaluation }: { evaluation: OrganizerEvaluation }) {
+  // 関連する祭りの情報を取得（タスクIDから祭りを特定）
+  const relatedTask = dummyOrganizerTasks.find(t => t.id === evaluation.taskId);
+  const relatedFestival = relatedTask ? dummyFestivals.find(f => 
+    f.location === relatedTask.location && f.date === relatedTask.date
+  ) : null;
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'excellent': return 'bg-green-500 text-white';
@@ -300,6 +365,9 @@ const EvaluationCard = memo(function EvaluationCard({ evaluation }: { evaluation
           <div>
             <h4 className="font-semibold text-gray-800 text-sm">{evaluation.organizerName}</h4>
             <p className="text-xs text-gray-500">{evaluation.taskTitle}</p>
+            {relatedFestival && (
+              <p className="text-xs text-blue-600">祭り: {relatedFestival.name}</p>
+            )}
             <p className="text-xs text-gray-500">{evaluation.createdAt}</p>
           </div>
           <div className="flex items-center gap-2">
