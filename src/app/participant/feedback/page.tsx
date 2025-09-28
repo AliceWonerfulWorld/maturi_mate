@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Star } from 'lucide-react';
 import Link from 'next/link';
 
+const MAX_COMMENT_LENGTH = 500;
+
 export default function ParticipantFeedbackPage() {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
@@ -16,8 +18,13 @@ export default function ParticipantFeedbackPage() {
       alert('評価を選択してください');
       return;
     }
-    if (comment.trim() === '') {
+    const trimmedComment = comment.trim();
+    if (trimmedComment === '') {
       alert('コメントを入力してください');
+      return;
+    }
+    if (trimmedComment.length > MAX_COMMENT_LENGTH) {
+      alert(`コメントは${MAX_COMMENT_LENGTH}文字以内で入力してください`);
       return;
     }
     setIsSubmitted(true);
@@ -26,7 +33,7 @@ export default function ParticipantFeedbackPage() {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-dvh bg-gray-50 flex items-center justify-center px-4">
         <div className="text-center">
           <div className="mb-4">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
@@ -44,7 +51,7 @@ export default function ParticipantFeedbackPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-dvh bg-gray-50 flex flex-col">
       {/* ヘッダー */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-md mx-auto px-4 py-4 flex items-center">
@@ -55,74 +62,79 @@ export default function ParticipantFeedbackPage() {
         </div>
       </header>
 
-      <div className="max-w-md mx-auto px-4 py-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>タスクの感想を教えてください</CardTitle>
-            <CardDescription>
-              あなたの体験を他の参加者と共有しましょう
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* 評価 */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                評価
-              </label>
-              <div className="flex space-x-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button
-                    key={star}
-                    onClick={() => setRating(star)}
-                    className="focus:outline-none"
-                  >
-                    <Star
-                      className={`h-8 w-8 ${
-                        star <= rating
-                          ? 'text-yellow-400 fill-current'
-                          : 'text-gray-300'
-                      }`}
-                    />
-                  </button>
-                ))}
+      <main className="flex-1 overflow-y-auto pb-10">
+        <div className="max-w-md mx-auto px-4 py-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>タスクの感想を教えてください</CardTitle>
+              <CardDescription>
+                あなたの体験を他の参加者と共有しましょう
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* 評価 */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  評価
+                </label>
+                <div className="flex space-x-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      onClick={() => setRating(star)}
+                      className="focus:outline-none"
+                    >
+                      <Star
+                        className={`h-8 w-8 ${
+                          star <= rating
+                            ? 'text-yellow-400 fill-current'
+                            : 'text-gray-300'
+                        }`}
+                      />
+                    </button>
+                  ))}
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  {rating === 0 && '評価を選択してください'}
+                  {rating === 1 && 'とても悪い'}
+                  {rating === 2 && '悪い'}
+                  {rating === 3 && '普通'}
+                  {rating === 4 && '良い'}
+                  {rating === 5 && 'とても良い'}
+                </p>
               </div>
-              <p className="text-xs text-gray-500 mt-1">
-                {rating === 0 && '評価を選択してください'}
-                {rating === 1 && 'とても悪い'}
-                {rating === 2 && '悪い'}
-                {rating === 3 && '普通'}
-                {rating === 4 && '良い'}
-                {rating === 5 && 'とても良い'}
-              </p>
-            </div>
 
-            {/* コメント */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                コメント
-              </label>
-              <textarea
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                placeholder="タスクの感想や体験を教えてください..."
-                className="w-full h-32 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                {comment.length}/500文字
-              </p>
-            </div>
+              {/* コメント */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  コメント
+                </label>
+                <textarea
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="タスクの感想や体験を教えてください..."
+                  className="w-full h-32 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  maxLength={MAX_COMMENT_LENGTH}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  残り{MAX_COMMENT_LENGTH - comment.length}文字（最大{MAX_COMMENT_LENGTH}文字）
+                </p>
+              </div>
 
-            {/* 投稿ボタン */}
-            <Button
-              onClick={handleSubmit}
-              disabled={rating === 0 || comment.trim() === ''}
-              className="w-full"
-            >
-              口コミを投稿する
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+              {/* 投稿ボタン */}
+              <Button
+                onClick={handleSubmit}
+                disabled={
+                  rating === 0 || comment.trim() === '' || comment.trim().length > MAX_COMMENT_LENGTH
+                }
+                className="w-full"
+              >
+                口コミを投稿する
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
     </div>
   );
 }
