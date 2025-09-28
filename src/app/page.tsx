@@ -34,8 +34,8 @@ export default function RoleSelectorPage() {
           {/* ロール選択 */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             {/* 参加者（若者） */}
-            <Link href="/participant">
-              <Card className="group hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 sm:hover:-translate-y-2 bg-white/80 backdrop-blur-sm border-0 shadow-xl h-full">
+            <Link href="/participant" prefetch={false}>
+              <Card className="group hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 sm:hover:-translate-y-2 bg-white/80 backdrop-blur-sm border-0 shadow-xl h-full will-change-transform gpu-accelerated contain-layout">
                 <CardHeader className="pb-3 sm:pb-4">
                   <div className="flex flex-col items-center text-center space-y-3">
                     <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-slate-500 to-gray-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
@@ -81,8 +81,8 @@ export default function RoleSelectorPage() {
             </Link>
 
             {/* 運営者 */}
-            <Link href="/organizer">
-              <Card className="group hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 sm:hover:-translate-y-2 bg-white/80 backdrop-blur-sm border-0 shadow-xl h-full">
+            <Link href="/organizer" prefetch={false}>
+              <Card className="group hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 sm:hover:-translate-y-2 bg-white/80 backdrop-blur-sm border-0 shadow-xl h-full will-change-transform gpu-accelerated contain-layout">
                 <CardHeader className="pb-3 sm:pb-4">
                   <div className="flex flex-col items-center text-center space-y-3">
                     <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-amber-600 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">

@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo, memo, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Search, MapPin, Calendar, Clock, Users, Gift } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import { dummyTasks } from '@/lib/dummy-data';
 import { Task } from '@/types';
 import Link from 'next/link';
@@ -13,14 +14,26 @@ export default function ParticipantHomePage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
 
-  const filteredTasks = dummyTasks.filter(task => {
-    const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         task.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesTag = !selectedTag || task.tags.includes(selectedTag);
-    return matchesSearch && matchesTag;
-  });
+  const filteredTasks = useMemo(() => {
+    return dummyTasks.filter(task => {
+      const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           task.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesTag = !selectedTag || task.tags.includes(selectedTag);
+      return matchesSearch && matchesTag;
+    });
+  }, [searchTerm, selectedTag]);
 
-  const allTags = Array.from(new Set(dummyTasks.flatMap(task => task.tags)));
+  const allTags = useMemo(() => {
+    return Array.from(new Set(dummyTasks.flatMap(task => task.tags)));
+  }, []);
+
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  }, []);
+
+  const handleTagSelect = useCallback((tag: string | null) => {
+    setSelectedTag(tag);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-stone-50">
@@ -33,15 +46,15 @@ export default function ParticipantHomePage() {
 
       {/* ヘッダー */}
       <header className="relative z-10 bg-white/80 backdrop-blur-sm shadow-lg border-b border-white/20">
-        <div className="max-w-md mx-auto px-4 py-6">
+        <div className="max-w-md mx-auto px-4 py-4">
           <div className="text-center">
-            <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-slate-600 to-gray-700 rounded-full mb-3 shadow-lg">
-              <Calendar className="h-6 w-6 text-white" />
+            <div className="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-r from-slate-600 to-gray-700 rounded-full mb-2 shadow-lg">
+              <Calendar className="h-5 w-5 text-white" />
             </div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-slate-700 to-gray-800 bg-clip-text text-transparent mb-2">
+            <h1 className="text-xl font-bold bg-gradient-to-r from-slate-700 to-gray-800 bg-clip-text text-transparent mb-1">
               Matsuri Mate
             </h1>
-            <p className="text-sm text-gray-600 bg-white/50 backdrop-blur-sm px-4 py-2 rounded-full inline-block">
+            <p className="text-xs text-gray-600 bg-white/50 backdrop-blur-sm px-3 py-1 rounded-full inline-block">
               参加者モード
             </p>
           </div>
@@ -57,7 +70,7 @@ export default function ParticipantHomePage() {
               type="text"
               placeholder="タスクを検索..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchChange}
               className="w-full pl-12 pr-4 py-4 bg-white/80 backdrop-blur-sm border border-white/30 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-lg text-base placeholder-gray-500"
             />
           </div>
@@ -69,7 +82,7 @@ export default function ParticipantHomePage() {
             <Button
               variant={selectedTag === null ? "default" : "outline"}
               size="sm"
-              onClick={() => setSelectedTag(null)}
+              onClick={() => handleTagSelect(null)}
               className={`rounded-full px-4 py-2 font-medium transition-all duration-300 ${
                 selectedTag === null 
                   ? "bg-gradient-to-r from-slate-600 to-gray-700 text-white shadow-lg hover:shadow-xl" 
@@ -83,7 +96,7 @@ export default function ParticipantHomePage() {
                 key={tag}
                 variant={selectedTag === tag ? "default" : "outline"}
                 size="sm"
-                onClick={() => setSelectedTag(tag)}
+                onClick={() => handleTagSelect(tag)}
                 className={`rounded-full px-4 py-2 font-medium transition-all duration-300 ${
                   selectedTag === tag 
                     ? "bg-gradient-to-r from-slate-600 to-gray-700 text-white shadow-lg hover:shadow-xl" 
@@ -97,7 +110,7 @@ export default function ParticipantHomePage() {
         </div>
 
         {/* タスク一覧 */}
-        <div className="space-y-6 pb-24">
+        <div className="space-y-12 pb-24">
           {filteredTasks.map((task) => (
             <TaskCard key={task.id} task={task} />
           ))}
@@ -106,11 +119,11 @@ export default function ParticipantHomePage() {
         {/* ナビゲーション */}
         <nav className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-white/20 shadow-lg">
           <div className="max-w-md mx-auto flex justify-around py-3">
-            <Link href="/participant" className="flex flex-col items-center py-2 px-4 rounded-full bg-gradient-to-r from-slate-600 to-gray-700 text-white shadow-lg">
+            <Link href="/participant" className="flex flex-col items-center py-2 px-4 rounded-full bg-gradient-to-r from-slate-600 to-gray-700 text-white shadow-lg" prefetch={false}>
               <Calendar className="h-5 w-5 mb-1" />
               <span className="text-xs font-medium">ホーム</span>
             </Link>
-            <Link href="/participant/profile" className="flex flex-col items-center py-2 px-4 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300">
+            <Link href="/participant/profile" className="flex flex-col items-center py-2 px-4 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300" prefetch={false}>
               <Users className="h-5 w-5 mb-1" />
               <span className="text-xs font-medium">プロフィール</span>
             </Link>
@@ -121,10 +134,10 @@ export default function ParticipantHomePage() {
   );
 }
 
-function TaskCard({ task }: { task: Task }) {
+const TaskCard = memo(function TaskCard({ task }: { task: Task }) {
   return (
-    <Link href={`/participant/task/${task.id}`}>
-      <Card className="group hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 bg-white/90 backdrop-blur-sm border-0 shadow-xl overflow-hidden">
+    <Link href={`/participant/task/${task.id}`} prefetch={false}>
+      <Card className="group hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 bg-white/90 backdrop-blur-sm border-0 shadow-xl overflow-hidden will-change-transform gpu-accelerated contain-layout">
         {/* ヘッダー部分 */}
         <CardHeader className="pb-3 relative">
           <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-slate-500/10 to-gray-500/10 rounded-full transform translate-x-8 -translate-y-8"></div>
@@ -193,4 +206,4 @@ function TaskCard({ task }: { task: Task }) {
       </Card>
     </Link>
   );
-}
+});
