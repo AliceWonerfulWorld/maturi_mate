@@ -1,226 +1,258 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo, memo, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Calendar, Clock, Users, Gift, Plus, UserCheck, Eye } from 'lucide-react';
-import { dummyOrganizerTasks, dummyApplicants } from '@/lib/dummy-data';
-import { OrganizerTask, Applicant } from '@/types';
+import { Calendar, Users, UserCheck, TrendingUp, ArrowRight, Plus, Eye, Home } from 'lucide-react';
+import { dummyFestivals, dummyOrganizerTasks, dummyApplicants } from '@/lib/dummy-data';
+import { Festival, OrganizerTask } from '@/types';
 import Link from 'next/link';
 
-export default function OrganizerManagePage() {
-  const [selectedTask, setSelectedTask] = useState<OrganizerTask | null>(null);
-  const [applicants, setApplicants] = useState<Applicant[]>([]);
+export default function OrganizerDashboardPage() {
+  const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'all'>('week');
 
-  const handleTaskClick = (task: OrganizerTask) => {
-    setSelectedTask(task);
-    // 応募者データを取得（実際のアプリケーションではAPIを呼び出し）
-    const taskApplicants = dummyApplicants.filter(applicant => 
-      task.applicants.some(app => app.userId === applicant.id)
-    );
-    setApplicants(taskApplicants);
-  };
+  // ダッシュボード用の統計データ
+  const stats = useMemo(() => {
+    const totalFestivals = dummyFestivals.length;
+    const totalTasks = dummyOrganizerTasks.length;
+    const totalApplicants = dummyApplicants.length;
+    const pendingApplications = dummyApplicants.filter(app => app.status === 'pending').length;
+    
+    return {
+      totalFestivals,
+      totalTasks,
+      totalApplicants,
+      pendingApplications
+    };
+  }, []);
 
-  const handleApprove = (applicantId: string) => {
-    setApplicants(prev => 
-      prev.map(applicant => 
-        applicant.id === applicantId 
-          ? { ...applicant, status: 'approved' as const }
-          : applicant
-      )
-    );
-    // 実際のアプリケーションでは、ここでAPIを呼び出します
-  };
+  // 最近の祭り（最大3件）
+  const recentFestivals = useMemo(() => {
+    return dummyFestivals.slice(0, 3);
+  }, []);
 
-  const closeModal = () => {
-    setSelectedTask(null);
-    setApplicants([]);
-  };
+  // 最近の応募（最大5件）
+  const recentApplications = useMemo(() => {
+    return dummyApplicants.filter(app => app.status === 'pending').slice(0, 5);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-gray-100 to-stone-100">
+      {/* 背景装飾 */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-slate-300 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gray-300 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse delay-1000"></div>
+        <div className="absolute top-40 left-1/2 w-80 h-80 bg-slate-400 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse delay-500"></div>
+      </div>
+
       {/* ヘッダー */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="relative z-10 bg-white/80 backdrop-blur-sm shadow-lg border-b border-white/20">
         <div className="max-w-md mx-auto px-4 py-4">
-          <h1 className="text-lg font-semibold text-center">タスク管理</h1>
-          <p className="text-sm text-center text-gray-600">運営者モード</p>
+          <div className="flex items-center justify-between mb-2">
+            <Link href="/" prefetch={false}>
+              <Button variant="ghost" size="sm" className="text-gray-500 hover:text-slate-600 hover:bg-slate-100/50 rounded-full p-2 opacity-80 hover:opacity-100 transition-all duration-200">
+                <Home className="h-4 w-4" />
+              </Button>
+            </Link>
+            <div className="flex-1"></div>
+          </div>
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-r from-slate-600 to-gray-700 rounded-full mb-2 shadow-lg">
+              <TrendingUp className="h-5 w-5 text-white" />
+            </div>
+            <h1 className="text-xl font-bold bg-gradient-to-r from-slate-700 to-gray-800 bg-clip-text text-transparent mb-1">
+              ダッシュボード
+            </h1>
+            <p className="text-xs text-gray-600 bg-white/50 backdrop-blur-sm px-3 py-1 rounded-full inline-block">
+              運営者モード
+            </p>
+          </div>
         </div>
       </header>
 
-      <div className="max-w-md mx-auto px-4 py-6">
-        {/* 新規登録ボタン */}
-        <div className="mb-6">
-          <Link href="/organizer/register">
-            <Button className="w-full">
-              <Plus className="h-4 w-4 mr-2" />
-              新しいタスクを登録
-            </Button>
+      <div className="relative z-10 max-w-md mx-auto px-4 py-6 space-y-6 pb-32">
+        {/* 統計カード */}
+        <div className="grid grid-cols-2 gap-4">
+          <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
+            <CardContent className="p-4 text-center">
+              <div className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                <Calendar className="h-4 w-4 text-slate-600" />
+              </div>
+              <div className="text-2xl font-bold text-gray-800">{stats.totalFestivals}</div>
+              <div className="text-xs text-gray-600">登録祭り</div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
+            <CardContent className="p-4 text-center">
+              <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                <Users className="h-4 w-4 text-gray-600" />
+              </div>
+              <div className="text-2xl font-bold text-gray-800">{stats.totalTasks}</div>
+              <div className="text-xs text-gray-600">登録タスク</div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
+            <CardContent className="p-4 text-center">
+              <div className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                <UserCheck className="h-4 w-4 text-slate-600" />
+              </div>
+              <div className="text-2xl font-bold text-gray-800">{stats.totalApplicants}</div>
+              <div className="text-xs text-gray-600">総応募者</div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
+            <CardContent className="p-4 text-center">
+              <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                <Eye className="h-4 w-4 text-gray-600" />
+              </div>
+              <div className="text-2xl font-bold text-gray-800">{stats.pendingApplications}</div>
+              <div className="text-xs text-gray-600">未承認</div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* クイックアクション */}
+        <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
+          <CardHeader>
+            <CardTitle className="text-lg font-bold text-gray-800">クイックアクション</CardTitle>
+            <CardDescription className="text-gray-600">よく使用する機能へのショートカット</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Link href="/organizer/festivals/register" prefetch={false}>
+              <Button className="w-full bg-gradient-to-r from-slate-600 to-gray-700 hover:from-slate-700 hover:to-gray-800 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                <Plus className="h-4 w-4 mr-2" />
+                新しい祭りを登録
+              </Button>
+            </Link>
+            
+            <div className="grid grid-cols-2 gap-3">
+              <Link href="/organizer/festivals" prefetch={false}>
+                <Button variant="outline" className="w-full bg-white/80 backdrop-blur-sm border-slate-200 text-slate-700 hover:bg-slate-50">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  祭り一覧
+                </Button>
+              </Link>
+              
+              <Link href="/organizer/tasks" prefetch={false}>
+                <Button variant="outline" className="w-full bg-white/80 backdrop-blur-sm border-gray-200 text-gray-700 hover:bg-gray-50">
+                  <Users className="h-4 w-4 mr-2" />
+                  タスク管理
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* 最近の祭り */}
+        <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <CardTitle className="text-lg font-bold text-gray-800">最近の祭り</CardTitle>
+              <Link href="/organizer/festivals" prefetch={false}>
+                <Button variant="ghost" size="sm" className="text-slate-600 hover:text-slate-700">
+                  すべて見る
+                  <ArrowRight className="h-3 w-3 ml-1" />
+                </Button>
+              </Link>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {recentFestivals.map((festival) => (
+              <FestivalSummaryCard key={festival.id} festival={festival} />
+            ))}
+          </CardContent>
+        </Card>
+
+        {/* 最近の応募 */}
+        <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <CardTitle className="text-lg font-bold text-gray-800">承認待ちの応募</CardTitle>
+              <Link href="/organizer/applications" prefetch={false}>
+                <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-700">
+                  すべて見る
+                  <ArrowRight className="h-3 w-3 ml-1" />
+                </Button>
+              </Link>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {recentApplications.map((applicant) => (
+              <ApplicantSummaryCard key={applicant.id} applicant={applicant} />
+            ))}
+            {recentApplications.length === 0 && (
+              <div className="text-center py-4 text-gray-500">
+                <UserCheck className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                <p className="text-sm">承認待ちの応募はありません</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* ナビゲーション */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-white/20 shadow-lg z-50">
+        <div className="max-w-md mx-auto flex justify-around py-3">
+          <Link href="/organizer" className="flex flex-col items-center py-2 px-3 rounded-full bg-gradient-to-r from-slate-600 to-gray-700 text-white shadow-lg" prefetch={false}>
+            <TrendingUp className="h-5 w-5 mb-1" />
+            <span className="text-xs font-medium">ダッシュボード</span>
+          </Link>
+          <Link href="/organizer/festivals" className="flex flex-col items-center py-2 px-3 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300" prefetch={false}>
+            <Calendar className="h-5 w-5 mb-1" />
+            <span className="text-xs font-medium">祭り管理</span>
+          </Link>
+          <Link href="/organizer/applications" className="flex flex-col items-center py-2 px-3 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300" prefetch={false}>
+            <Users className="h-5 w-5 mb-1" />
+            <span className="text-xs font-medium">応募者管理</span>
           </Link>
         </div>
-
-        {/* タスク一覧 */}
-        <div className="space-y-4">
-          {dummyOrganizerTasks.map((task) => (
-            <TaskCard key={task.id} task={task} onClick={() => handleTaskClick(task)} />
-          ))}
-        </div>
-
-        {/* 応募者リストモーダル */}
-        {selectedTask && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg max-w-md w-full max-h-[80vh] overflow-y-auto">
-              <div className="p-6">
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-bold">応募者一覧</h2>
-                  <Button variant="outline" onClick={closeModal}>
-                    ×
-                  </Button>
-                </div>
-                
-                <div className="mb-4">
-                  <h3 className="font-medium text-gray-900">{selectedTask.title}</h3>
-                  <p className="text-sm text-gray-600">{selectedTask.date} {selectedTask.time}</p>
-                </div>
-
-                <div className="space-y-3">
-                  {applicants.map((applicant) => (
-                    <ApplicantCard 
-                      key={applicant.id} 
-                      applicant={applicant} 
-                      onApprove={() => handleApprove(applicant.id)}
-                    />
-                  ))}
-                </div>
-
-                {applicants.length === 0 && (
-                  <p className="text-center text-gray-500 py-4">
-                    まだ応募者がいません
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ナビゲーション */}
-        <nav className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-white/20 shadow-lg">
-          <div className="max-w-md mx-auto flex justify-around py-3">
-            <Link href="/organizer/dashboard" className="flex flex-col items-center py-2 px-3 rounded-full bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-lg" prefetch={false}>
-              <UserCheck className="h-5 w-5 mb-1" />
-              <span className="text-xs font-medium">ダッシュボード</span>
-            </Link>
-            <Link href="/organizer/festivals" className="flex flex-col items-center py-2 px-3 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300" prefetch={false}>
-              <Calendar className="h-5 w-5 mb-1" />
-              <span className="text-xs font-medium">祭り管理</span>
-            </Link>
-            <Link href="/organizer/tasks" className="flex flex-col items-center py-2 px-3 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300" prefetch={false}>
-              <Users className="h-5 w-5 mb-1" />
-              <span className="text-xs font-medium">タスク管理</span>
-            </Link>
-          </div>
-        </nav>
-      </div>
+      </nav>
     </div>
   );
 }
 
-function TaskCard({ task, onClick }: { task: OrganizerTask; onClick: () => void }) {
-  const pendingCount = task.applicants.filter(app => app.status === 'pending').length;
-  const approvedCount = task.applicants.filter(app => app.status === 'approved').length;
-
+const FestivalSummaryCard = memo(function FestivalSummaryCard({ festival }: { festival: Festival }) {
   return (
-    <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={onClick}>
-      <CardHeader className="pb-3">
+    <Link href={`/organizer/festivals/${festival.id}`} prefetch={false}>
+      <div className="group hover:bg-slate-50/50 rounded-lg p-3 transition-colors cursor-pointer">
         <div className="flex justify-between items-start">
-          <CardTitle className="text-lg">{task.title}</CardTitle>
-          <Badge variant={task.status === 'open' ? 'default' : 'secondary'}>
-            {task.status === 'open' ? '募集中' : '終了'}
-          </Badge>
+          <div className="flex-1">
+            <h4 className="font-semibold text-gray-800 group-hover:text-slate-700 transition-colors text-sm">
+              {festival.name}
+            </h4>
+            <p className="text-xs text-gray-600 mt-1">{festival.date} {festival.time}</p>
+            <p className="text-xs text-gray-500 mt-1">{festival.location}</p>
+          </div>
+          <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-slate-600 transition-colors" />
         </div>
-        <CardDescription className="line-clamp-2">
-          {task.description}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="pt-0">
-        <div className="space-y-2">
-          <div className="flex items-center text-sm text-gray-600">
-            <MapPin className="h-4 w-4 mr-2" />
-            {task.location}
-          </div>
-          <div className="flex items-center text-sm text-gray-600">
-            <Calendar className="h-4 w-4 mr-2" />
-            {task.date}
-          </div>
-          <div className="flex items-center text-sm text-gray-600">
-            <Clock className="h-4 w-4 mr-2" />
-            {task.time}
-          </div>
-          <div className="flex items-center text-sm text-gray-600">
-            <Users className="h-4 w-4 mr-2" />
-            {task.currentParticipants}/{task.capacity}人
-          </div>
-          <div className="flex items-center text-sm text-gray-600">
-            <Gift className="h-4 w-4 mr-2" />
-            {task.reward}
-          </div>
-        </div>
-        
-        <div className="flex justify-between items-center mt-4">
-          <div className="flex flex-wrap gap-1">
-            {task.tags.map(tag => (
-              <Badge key={tag} variant="outline" className="text-xs">
-                {tag}
+      </div>
+    </Link>
+  );
+});
+
+const ApplicantSummaryCard = memo(function ApplicantSummaryCard({ applicant }: { applicant: any }) {
+  return (
+    <div className="bg-white/80 backdrop-blur-sm rounded-lg p-3 border border-gray-100">
+      <div className="flex justify-between items-start">
+        <div className="flex-1">
+          <h4 className="font-semibold text-gray-800 text-sm">{applicant.name}</h4>
+          <p className="text-xs text-gray-600 mt-1">レベル {applicant.level}</p>
+          <div className="flex flex-wrap gap-1 mt-2">
+            {applicant.badges.map((badge: string) => (
+              <Badge key={badge} variant="outline" className="text-xs bg-gray-50 text-gray-600 border-gray-200">
+                {badge}
               </Badge>
             ))}
           </div>
-          <div className="flex items-center text-sm text-gray-500">
-            <Eye className="h-4 w-4 mr-1" />
-            {pendingCount}件の応募
-          </div>
         </div>
-
-        <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-600">承認済み: {approvedCount}人</span>
-            <span className="text-blue-600">未承認: {pendingCount}人</span>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+        <Badge className="bg-gray-500 text-white text-xs">
+          承認待ち
+        </Badge>
+      </div>
+    </div>
   );
-}
-
-function ApplicantCard({ applicant, onApprove }: { applicant: Applicant; onApprove: () => void }) {
-  return (
-    <Card>
-      <CardContent className="p-4">
-        <div className="flex justify-between items-start">
-          <div className="flex-1">
-            <div className="flex items-center space-x-2 mb-2">
-              <h4 className="font-medium">{applicant.name}</h4>
-              <Badge variant="outline">レベル {applicant.level}</Badge>
-              <Badge variant={applicant.status === 'approved' ? 'default' : 'secondary'}>
-                {applicant.status === 'approved' ? '承認済み' : '未承認'}
-              </Badge>
-            </div>
-            <p className="text-sm text-gray-600 mb-2">{applicant.profile}</p>
-            <div className="flex flex-wrap gap-1 mb-2">
-              {applicant.badges.map(badge => (
-                <Badge key={badge} variant="outline" className="text-xs">
-                  {badge}
-                </Badge>
-              ))}
-            </div>
-            <p className="text-xs text-gray-500">応募日: {applicant.appliedAt}</p>
-          </div>
-          {applicant.status === 'pending' && (
-            <Button size="sm" onClick={onApprove}>
-              承認
-            </Button>
-          )}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
+});
