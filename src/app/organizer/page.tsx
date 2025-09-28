@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, memo, useCallback } from 'react';
+import { useState, useMemo, memo, useCallback, lazy, Suspense } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -12,7 +12,7 @@ import Link from 'next/link';
 export default function OrganizerDashboardPage() {
   const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'all'>('week');
 
-  // ダッシュボード用の統計データ
+  // ダッシュボード用の統計データ（メモ化強化）
   const stats = useMemo(() => {
     const totalFestivals = dummyFestivals.length;
     const totalTasks = dummyOrganizerTasks.length;
@@ -25,7 +25,7 @@ export default function OrganizerDashboardPage() {
       totalApplicants,
       pendingApplications
     };
-  }, []);
+  }, []); // 依存配列を空にして、初回のみ計算
 
   // 最近の祭り（最大3件）
   const recentFestivals = useMemo(() => {
@@ -48,9 +48,9 @@ export default function OrganizerDashboardPage() {
 
       {/* ヘッダー */}
       <header className="relative z-10 bg-white/80 backdrop-blur-sm shadow-lg border-b border-white/20">
-        <div className="max-w-md mx-auto px-4 py-4">
-          <div className="flex items-center justify-between mb-2">
-            <Link href="/" prefetch={false}>
+        <div className="max-w-md mx-auto px-3 py-3">
+          <div className="flex items-center justify-between mb-1">
+            <Link href="/">
               <Button variant="ghost" size="sm" className="text-gray-500 hover:text-slate-600 hover:bg-slate-100/50 rounded-full p-2 opacity-80 hover:opacity-100 transition-all duration-200">
                 <Home className="h-4 w-4" />
               </Button>
@@ -122,7 +122,7 @@ export default function OrganizerDashboardPage() {
             <CardDescription className="text-gray-600">よく使用する機能へのショートカット</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
-            <Link href="/organizer/festivals/register" prefetch={false}>
+            <Link href="/organizer/festivals/register">
               <Button className="w-full bg-gradient-to-r from-slate-600 to-gray-700 hover:from-slate-700 hover:to-gray-800 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                 <Plus className="h-4 w-4 mr-2" />
                 新しい祭りを登録
@@ -130,14 +130,14 @@ export default function OrganizerDashboardPage() {
             </Link>
             
             <div className="grid grid-cols-2 gap-3">
-              <Link href="/organizer/festivals" prefetch={false}>
+              <Link href="/organizer/festivals">
                 <Button variant="outline" className="w-full bg-white/80 backdrop-blur-sm border-slate-200 text-slate-700 hover:bg-slate-50">
                   <Calendar className="h-4 w-4 mr-2" />
                   祭り一覧
                 </Button>
               </Link>
               
-              <Link href="/organizer/tasks" prefetch={false}>
+              <Link href="/organizer/tasks">
                 <Button variant="outline" className="w-full bg-white/80 backdrop-blur-sm border-gray-200 text-gray-700 hover:bg-gray-50">
                   <Users className="h-4 w-4 mr-2" />
                   タスク管理
@@ -152,7 +152,7 @@ export default function OrganizerDashboardPage() {
           <CardHeader>
             <div className="flex justify-between items-center">
               <CardTitle className="text-lg font-bold text-gray-800">最近の祭り</CardTitle>
-              <Link href="/organizer/festivals" prefetch={false}>
+              <Link href="/organizer/festivals">
                 <Button variant="ghost" size="sm" className="text-slate-600 hover:text-slate-700">
                   すべて見る
                   <ArrowRight className="h-3 w-3 ml-1" />
@@ -172,7 +172,7 @@ export default function OrganizerDashboardPage() {
           <CardHeader>
             <div className="flex justify-between items-center">
               <CardTitle className="text-lg font-bold text-gray-800">承認待ちの応募</CardTitle>
-              <Link href="/organizer/applications" prefetch={false}>
+              <Link href="/organizer/applications">
                 <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-700">
                   すべて見る
                   <ArrowRight className="h-3 w-3 ml-1" />
@@ -197,15 +197,15 @@ export default function OrganizerDashboardPage() {
       {/* ナビゲーション */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-white/20 shadow-lg z-50">
         <div className="max-w-md mx-auto flex justify-around py-3">
-          <Link href="/organizer" className="flex flex-col items-center py-2 px-3 rounded-full bg-gradient-to-r from-slate-600 to-gray-700 text-white shadow-lg" prefetch={false}>
+          <Link href="/organizer" className="flex flex-col items-center py-2 px-3 rounded-full bg-gradient-to-r from-slate-600 to-gray-700 text-white shadow-lg">
             <TrendingUp className="h-5 w-5 mb-1" />
             <span className="text-xs font-medium">ダッシュボード</span>
           </Link>
-          <Link href="/organizer/festivals" className="flex flex-col items-center py-2 px-3 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300" prefetch={false}>
+          <Link href="/organizer/festivals" className="flex flex-col items-center py-2 px-3 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300">
             <Calendar className="h-5 w-5 mb-1" />
             <span className="text-xs font-medium">祭り管理</span>
           </Link>
-          <Link href="/organizer/applications" className="flex flex-col items-center py-2 px-3 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300" prefetch={false}>
+          <Link href="/organizer/applications" className="flex flex-col items-center py-2 px-3 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300">
             <Users className="h-5 w-5 mb-1" />
             <span className="text-xs font-medium">応募者管理</span>
           </Link>
@@ -217,7 +217,7 @@ export default function OrganizerDashboardPage() {
 
 const FestivalSummaryCard = memo(function FestivalSummaryCard({ festival }: { festival: Festival }) {
   return (
-    <Link href={`/organizer/festivals/${festival.id}`} prefetch={false}>
+    <Link href={`/organizer/festivals/${festival.id}`}>
       <div className="group hover:bg-slate-50/50 rounded-lg p-3 transition-colors cursor-pointer">
         <div className="flex justify-between items-start">
           <div className="flex-1">

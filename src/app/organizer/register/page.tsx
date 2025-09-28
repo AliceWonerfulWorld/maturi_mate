@@ -65,7 +65,7 @@ export default function OrganizerTaskRegisterPage() {
     <div className="min-h-screen bg-gray-50">
       {/* ヘッダー */}
       <header className="bg-white shadow-sm border-b">
-        <div className="max-w-md mx-auto px-4 py-4 flex items-center">
+        <div className="max-w-md mx-auto px-3 py-3 flex items-center">
           <Link href="/organizer" className="mr-4">
             <ArrowLeft className="h-5 w-5" />
           </Link>

@@ -54,9 +54,9 @@ export default function OrganizerFestivalDetailPage() {
 
       {/* ヘッダー */}
       <header className="relative z-10 bg-white/80 backdrop-blur-sm shadow-lg border-b border-white/20">
-        <div className="max-w-md mx-auto px-4 py-4">
-          <div className="flex items-center justify-between mb-2">
-            <Link href="/organizer/festivals" prefetch={false}>
+        <div className="max-w-md mx-auto px-3 py-3">
+          <div className="flex items-center justify-between mb-1">
+            <Link href="/organizer/festivals" >
               <Button variant="ghost" size="sm" className="text-gray-500 hover:text-slate-600 hover:bg-slate-100/50 rounded-full p-2 opacity-80 hover:opacity-100 transition-all duration-200">
                 <ArrowLeft className="h-4 w-4" />
               </Button>
@@ -102,7 +102,7 @@ export default function OrganizerFestivalDetailPage() {
         {/* 新規タスク登録ボタン */}
         <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
           <CardContent className="p-6 text-center">
-            <Link href={`/organizer/festivals/${festivalId}/tasks/register`} prefetch={false}>
+            <Link href={`/organizer/festivals/${festivalId}/tasks/register`} >
               <Button className="w-full bg-gradient-to-r from-slate-600 to-gray-700 hover:from-slate-700 hover:to-gray-800 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                 <Plus className="h-4 w-4 mr-2" />
                 新しいタスクを登録
@@ -138,15 +138,15 @@ export default function OrganizerFestivalDetailPage() {
       {/* ナビゲーション */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-white/20 shadow-lg z-50">
         <div className="max-w-md mx-auto flex justify-around py-3">
-          <Link href="/organizer" className="flex flex-col items-center py-2 px-3 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300" prefetch={false}>
+          <Link href="/organizer" className="flex flex-col items-center py-2 px-3 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300" >
             <TrendingUp className="h-5 w-5 mb-1" />
             <span className="text-xs font-medium">ダッシュボード</span>
           </Link>
-          <Link href="/organizer/festivals" className="flex flex-col items-center py-2 px-3 rounded-full bg-gradient-to-r from-slate-600 to-gray-700 text-white shadow-lg" prefetch={false}>
+          <Link href="/organizer/festivals" className="flex flex-col items-center py-2 px-3 rounded-full bg-gradient-to-r from-slate-600 to-gray-700 text-white shadow-lg" >
             <Calendar className="h-5 w-5 mb-1" />
             <span className="text-xs font-medium">祭り管理</span>
           </Link>
-          <Link href="/organizer/applications" className="flex flex-col items-center py-2 px-3 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300" prefetch={false}>
+          <Link href="/organizer/applications" className="flex flex-col items-center py-2 px-3 rounded-full text-gray-500 hover:bg-gray-100/50 transition-all duration-300" >
             <Users className="h-5 w-5 mb-1" />
             <span className="text-xs font-medium">応募者管理</span>
           </Link>
@@ -195,7 +195,7 @@ const OrganizerTaskCard = memo(function OrganizerTaskCard({ task }: { task: Orga
           <div className="text-sm text-gray-600">
             応募者: {task.applicants.length}人
           </div>
-          <Link href="/organizer/applications" prefetch={false}>
+          <Link href="/organizer/applications" >
             <Button size="sm" className="bg-gradient-to-r from-slate-600 to-gray-700 hover:from-slate-700 hover:to-gray-800 text-white">
               <UserCheck className="h-3 w-3 mr-1" />
               管理
