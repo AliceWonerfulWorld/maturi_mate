@@ -45,12 +45,12 @@ export default function HomeButton({
         <Button 
           variant={variant} 
           size={size} 
-          className={`text-gray-500 hover:text-slate-600 hover:bg-slate-100/50 rounded-full p-2 opacity-80 hover:opacity-100 transition-all duration-200 ${className}`}
+          className={`text-gray-500 hover:text-slate-600 hover:bg-slate-100/50 rounded-full p-3 sm:p-2 opacity-80 hover:opacity-100 transition-all duration-200 ${className}`}
         >
-          <Home className="h-4 w-4" />
+          <Home className="h-5 w-5 sm:h-4 sm:w-4" />
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent className="max-w-sm mx-auto p-6">
+      <AlertDialogContent className="max-w-sm mx-auto p-4 sm:p-6 w-[calc(100vw-2rem)] sm:w-auto">
         <AlertDialogHeader className="text-center space-y-3">
           <AlertDialogTitle className="text-xl font-bold text-gray-800">
             ホームに戻る

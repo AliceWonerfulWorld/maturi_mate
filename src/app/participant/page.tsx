@@ -5,24 +5,29 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Search, MapPin, Calendar, Clock, Users, Gift } from 'lucide-react';
-import dynamic from 'next/dynamic';
 import { dummyTasks } from '@/lib/dummy-data';
 import { Task } from '@/types';
 import Link from 'next/link';
 import HomeButton from '@/components/HomeButton';
+import { useDebounce } from '@/hooks/useDebounce';
+
+// TaskCardコンポーネントを直接定義
 
 export default function ParticipantHomePage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  
+  // デバウンスされた検索語
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
   const filteredTasks = useMemo(() => {
     return dummyTasks.filter(task => {
-      const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           task.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch = task.title.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+                           task.description.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
       const matchesTag = !selectedTag || task.tags.includes(selectedTag);
       return matchesSearch && matchesTag;
     });
-  }, [searchTerm, selectedTag]);
+  }, [debouncedSearchTerm, selectedTag]);
 
   const allTags = useMemo(() => {
     return Array.from(new Set(dummyTasks.flatMap(task => task.tags)));
@@ -115,10 +120,22 @@ export default function ParticipantHomePage() {
         </div>
 
         {/* タスク一覧 */}
-        <div className="space-y-12 pb-24">
-          {filteredTasks.map((task) => (
-            <TaskCard key={task.id} task={task} />
-          ))}
+        <div className="space-y-4 pb-24">
+          {filteredTasks.length > 0 ? (
+            filteredTasks.map((task) => (
+              <TaskCard key={task.id} task={task} />
+            ))
+          ) : (
+            <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-lg rounded-xl">
+              <CardContent className="p-8 text-center">
+                <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                <h3 className="text-lg font-semibold text-gray-700 mb-2">タスクが見つかりません</h3>
+                <p className="text-gray-500 text-sm">
+                  検索条件を変更して再度お試しください
+                </p>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* ナビゲーション */}
@@ -143,73 +160,77 @@ export default function ParticipantHomePage() {
   );
 }
 
+// TaskCardコンポーネント
 const TaskCard = memo(function TaskCard({ task }: { task: Task }) {
   return (
-    <Link href={`/participant/task/${task.id}`} prefetch={false}>
-      <Card className="group hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 bg-white/90 backdrop-blur-sm border-0 shadow-xl overflow-hidden will-change-transform gpu-accelerated contain-layout">
-        {/* ヘッダー部分 */}
-        <CardHeader className="pb-3 relative">
-          <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-slate-500/10 to-gray-500/10 rounded-full transform translate-x-8 -translate-y-8"></div>
-          <div className="relative z-10">
-            <div className="flex justify-between items-start mb-2">
-              <CardTitle className="text-lg font-bold text-gray-800 group-hover:text-slate-600 transition-colors pr-2">
-                {task.title}
-              </CardTitle>
-              <Badge 
-                variant={task.status === 'open' ? 'default' : 'secondary'}
-                className={`${
-                  task.status === 'open' 
-                    ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-md' 
-                    : 'bg-gray-200 text-gray-600'
-                } rounded-full px-3 py-1 text-xs font-medium`}
-              >
-                {task.status === 'open' ? '募集中' : '終了'}
-              </Badge>
-            </div>
-            <CardDescription className="text-gray-600 line-clamp-2 leading-relaxed">
-              {task.description}
-            </CardDescription>
+    <Link href={`/participant/task/${task.id}`} className="block">
+      <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-lg rounded-xl hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] hover:-translate-y-1">
+        <CardHeader className="pb-3">
+          <div className="flex justify-between items-start mb-2">
+            <CardTitle className="text-lg font-bold text-slate-800 leading-tight">
+              {task.title}
+            </CardTitle>
+            <Badge 
+              variant={task.status === 'open' ? 'default' : 'secondary'}
+              className={`ml-2 flex-shrink-0 ${
+                task.status === 'open' 
+                  ? 'bg-gradient-to-r from-green-500 to-green-600 text-white' 
+                  : 'bg-slate-200 text-slate-700'
+              }`}
+            >
+              {task.status === 'open' ? '募集中' : '終了'}
+            </Badge>
           </div>
+          <CardDescription className="text-slate-600 text-sm leading-relaxed">
+            {task.description}
+          </CardDescription>
         </CardHeader>
-        
-        <CardContent className="pt-0 relative z-10">
-          {/* タスク詳細 */}
-          <div className="grid grid-cols-2 gap-3 mb-4">
-            <div className="flex items-center text-sm text-gray-600 bg-slate-50/50 rounded-lg p-2">
+        <CardContent className="pt-0">
+          <div className="space-y-3">
+            {/* 基本情報 */}
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div className="flex items-center text-slate-600">
+                <Calendar className="h-4 w-4 mr-2 text-slate-500" />
+                <span>{task.date}</span>
+              </div>
+              <div className="flex items-center text-slate-600">
+                <Clock className="h-4 w-4 mr-2 text-slate-500" />
+                <span>{task.time}</span>
+              </div>
+            </div>
+            
+            <div className="flex items-center text-slate-600 text-sm">
               <MapPin className="h-4 w-4 mr-2 text-slate-500" />
               <span className="truncate">{task.location}</span>
             </div>
-            <div className="flex items-center text-sm text-gray-600 bg-gray-50/50 rounded-lg p-2">
-              <Calendar className="h-4 w-4 mr-2 text-gray-500" />
-              <span>{task.date}</span>
-            </div>
-            <div className="flex items-center text-sm text-gray-600 bg-stone-50/50 rounded-lg p-2">
-              <Clock className="h-4 w-4 mr-2 text-stone-500" />
-              <span>{task.time}</span>
-            </div>
-            <div className="flex items-center text-sm text-gray-600 bg-emerald-50/50 rounded-lg p-2">
-              <Users className="h-4 w-4 mr-2 text-emerald-500" />
-              <span>{task.currentParticipants}/{task.capacity}人</span>
-            </div>
-          </div>
 
-          {/* 報酬 */}
-          <div className="flex items-center text-sm text-gray-600 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg p-3 mb-4">
-            <Gift className="h-5 w-5 mr-2 text-amber-500" />
-            <span className="font-medium">{task.reward}</span>
-          </div>
+            {/* 参加者情報 */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center text-slate-600 text-sm">
+                <Users className="h-4 w-4 mr-2 text-slate-500" />
+                <span>{task.currentParticipants}/{task.capacity}人</span>
+              </div>
+              {task.reward && (
+                <div className="flex items-center text-slate-600 text-sm">
+                  <Gift className="h-4 w-4 mr-1 text-slate-500" />
+                  <span className="text-xs">{task.reward}</span>
+                </div>
+              )}
+            </div>
 
-          {/* タグ */}
-          <div className="flex flex-wrap gap-2">
-            {task.tags.map(tag => (
-              <Badge 
-                key={tag} 
-                variant="outline" 
-                className="text-xs bg-white/80 backdrop-blur-sm border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"
-              >
-                {tag}
-              </Badge>
-            ))}
+            {/* タグ */}
+            <div className="flex flex-wrap gap-1">
+              {task.tags.slice(0, 3).map(tag => (
+                <Badge key={tag} variant="outline" className="text-xs">
+                  {tag}
+                </Badge>
+              ))}
+              {task.tags.length > 3 && (
+                <Badge variant="outline" className="text-xs">
+                  +{task.tags.length - 3}
+                </Badge>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
